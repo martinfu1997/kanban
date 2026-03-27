@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Assistant Tasks</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    min-height: 100vh;
+    padding: 24px;
+  }
+
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 28px;
+    gap: 12px;
+  }
+
+  header h1 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #f0f6fc;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+  }
+
+  header h1 span { color: #58a6ff; }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  .add-btn {
+    background: #238636;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.15s;
+    white-space: nowrap;
+  }
+
+  .add-btn:hover { background: #2ea043; }
+
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .user-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #21262d;
+    border: 1px solid #30363d;
+    object-fit: cover;
+  }
+
+  .logout-btn {
+    background: transparent;
+    color: #8b949e;
+    border: 1px solid #30363d;
+    padding: 7px 13px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+    white-space: nowrap;
+  }
+
+  .logout-btn:hover {
+    color: #f85149;
+    border-color: #f85149;
+    background: rgba(248, 81, 73, 0.06);
+  }
+
+  /* Save indicator */
+  .save-indicator {
+    font-size: 0.75rem;
+    color: #484f58;
+    transition: color 0.3s;
+  }
+
+  .save-indicator.saving { color: #f0883e; }
+  .save-indicator.saved  { color: #3fb950; }
+
+  .board {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    align-items: start;
+  }
+
+  .column {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 12px;
+    padding: 16px;
+    min-height: 200px;
+  }
+
+  .column-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  .column-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #8b949e;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .column-title .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  #col-todo .dot     { background: #8b949e; }
+  #col-progress .dot { background: #f0883e; }
+  #col-done .dot     { background: #3fb950; }
+
+  .count {
+    background: #21262d;
+    color: #8b949e;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 12px;
+    min-width: 20px;
+    text-align: center;
+  }
+
+  .cards {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 60px;
+  }
+
+  .cards.drag-over {
+    background: rgba(88, 166, 255, 0.05);
+    border-radius: 8px;
+    outline: 2px dashed #30363d;
+  }
+
+  .card {
+    background: #21262d;
+    border: 1px solid #30363d;
+    border-radius: 10px;
+    padding: 14px;
+    cursor: grab;
+    user-select: none;
+    transition: border-color 0.15s, transform 0.1s, box-shadow 0.15s;
+    position: relative;
+  }
+
+  .card:hover {
+    border-color: #58a6ff;
+    box-shadow: 0 0 0 1px rgba(88,166,255,0.2);
+  }
+
+  .card.dragging {
+    opacity: 0.4;
+    cursor: grabbing;
+    transform: scale(0.98);
+  }
+
+  .card-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+
+  .card-icon {
+    font-size: 1.2rem;
+    line-height: 1;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .card-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #f0f6fc;
+    line-height: 1.3;
+    flex: 1;
+  }
+
+  .card-desc {
+    font-size: 0.78rem;
+    color: #8b949e;
+    line-height: 1.5;
+    margin-left: calc(1.2rem + 10px);
+  }
+
+  .card-actions {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: none;
+    gap: 4px;
+  }
+
+  .card:hover .card-actions { display: flex; }
+
+  .card-btn {
+    background: #30363d;
+    border: none;
+    color: #8b949e;
+    border-radius: 5px;
+    width: 22px;
+    height: 22px;
+    font-size: 0.7rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.1s, color 0.1s;
+  }
+
+  .card-btn:hover { background: #3d444d; color: #f0f6fc; }
+  .card-btn.del:hover { background: #3d1f22; color: #f85149; }
+
+  /* Modal */
+  .modal-bg {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-bg.open { display: flex; }
+
+  .modal {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 14px;
+    padding: 28px;
+    width: 420px;
+    max-width: calc(100vw - 32px);
+  }
+
+  .modal h2 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: #f0f6fc;
+  }
+
+  .form-group { margin-bottom: 14px; }
+
+  .form-group label {
+    display: block;
+    font-size: 0.78rem;
+    color: #8b949e;
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    width: 100%;
+    background: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    color: #e6edf3;
+    padding: 9px 12px;
+    font-size: 0.875rem;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .form-group input:focus,
+  .form-group textarea:focus,
+  .form-group select:focus { border-color: #58a6ff; }
+
+  .form-group textarea { resize: vertical; min-height: 70px; }
+  .form-group select option { background: #161b22; }
+
+  .modal-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 20px;
+  }
+
+  .btn-cancel {
+    background: transparent;
+    border: 1px solid #30363d;
+    color: #8b949e;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    cursor: pointer;
+    font-family: inherit;
+    transition: border-color 0.15s;
+  }
+
+  .btn-cancel:hover { border-color: #58a6ff; color: #e6edf3; }
+
+  .btn-save {
+    background: #238636;
+    color: #fff;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .btn-save:hover { background: #2ea043; }
+
+  @media (max-width: 680px) {
+    .board { grid-template-columns: 1fr; }
+    .user-info { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🤖 <span>AI Assistant</span> Tasks</h1>
+  <div class="header-right">
+    <span class="save-indicator" id="save-indicator"></span>
+    <button class="add-btn" onclick="openModal()">＋ Add Card</button>
+    <div class="user-info">
+      <img class="user-avatar" id="user-avatar" src="" alt="" style="display:none">
+    </div>
+    <button class="logout-btn" onclick="location.href='/logout'">Sign out</button>
+  </div>
+</header>
+
+<div class="board">
+  <div class="column" id="col-todo">
+    <div class="column-header">
+      <span class="column-title"><span class="dot"></span>Todo</span>
+      <span class="count" id="count-todo">0</span>
+    </div>
+    <div class="cards" id="cards-todo"></div>
+  </div>
+
+  <div class="column" id="col-progress">
+    <div class="column-header">
+      <span class="column-title"><span class="dot"></span>In Progress</span>
+      <span class="count" id="count-progress">0</span>
+    </div>
+    <div class="cards" id="cards-progress"></div>
+  </div>
+
+  <div class="column" id="col-done">
+    <div class="column-header">
+      <span class="column-title"><span class="dot"></span>Done</span>
+      <span class="count" id="count-done">0</span>
+    </div>
+    <div class="cards" id="cards-done"></div>
+  </div>
+</div>
+
+<!-- Add/Edit Modal -->
+<div class="modal-bg" id="modal-bg" onclick="handleBgClick(event)">
+  <div class="modal">
+    <h2 id="modal-title">Add Card</h2>
+    <div class="form-group">
+      <label>Title</label>
+      <input type="text" id="f-title" placeholder="Task title..." />
+    </div>
+    <div class="form-group">
+      <label>Description</label>
+      <textarea id="f-desc" placeholder="Optional description..."></textarea>
+    </div>
+    <div class="form-group">
+      <label>Icon / Emoji</label>
+      <input type="text" id="f-icon" placeholder="e.g. 🎙️ or leave blank" maxlength="4" />
+    </div>
+    <div class="form-group">
+      <label>Column</label>
+      <select id="f-col">
+        <option value="todo">Todo</option>
+        <option value="progress">In Progress</option>
+        <option value="done">Done</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" onclick="saveCard()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let cards = [];
+  let nextId = 1;
+  let editId = null;
+  let dragId = null;
+  let saveTimer = null;
+
+  // ── API ─────────────────────────────────────────────────────────────────────
+
+  async function loadCards() {
+    const res = await fetch('/api/cards');
+    cards = await res.json();
+    nextId = Math.max(...cards.map(c => c.id), 0) + 1;
+    render();
+  }
+
+  function scheduleSave() {
+    clearTimeout(saveTimer);
+    showIndicator('saving');
+    saveTimer = setTimeout(persistCards, 600);
+  }
+
+  async function persistCards() {
+    try {
+      await fetch('/api/cards', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(cards),
+      });
+      showIndicator('saved');
+      setTimeout(() => showIndicator(''), 2000);
+    } catch {
+      showIndicator('');
+    }
+  }
+
+  function showIndicator(state) {
+    const el = document.getElementById('save-indicator');
+    el.className = 'save-indicator' + (state ? ' ' + state : '');
+    el.textContent = state === 'saving' ? 'Saving…' : state === 'saved' ? 'Saved' : '';
+  }
+
+  // ── Render ──────────────────────────────────────────────────────────────────
+
+  function render() {
+    ['todo', 'progress', 'done'].forEach(col => {
+      const container = document.getElementById('cards-' + col);
+      const colCards = cards.filter(c => c.col === col);
+      container.innerHTML = colCards.map(card => `
+        <div class="card" id="card-${card.id}"
+          draggable="true"
+          ondragstart="onDragStart(event, ${card.id})"
+          ondragend="onDragEnd(event)">
+          <div class="card-actions">
+            <button class="card-btn" onclick="editCard(${card.id})" title="Edit">✎</button>
+            <button class="card-btn del" onclick="deleteCard(${card.id})" title="Delete">✕</button>
+          </div>
+          <div class="card-top">
+            ${card.icon ? `<span class="card-icon">${card.icon}</span>` : ''}
+            <span class="card-title">${esc(card.title)}</span>
+          </div>
+          ${card.desc ? `<p class="card-desc">${esc(card.desc)}</p>` : ''}
+        </div>
+      `).join('');
+      document.getElementById('count-' + col).textContent = colCards.length;
+
+      container.ondragover  = e => { e.preventDefault(); container.classList.add('drag-over'); };
+      container.ondragleave = e => { if (!container.contains(e.relatedTarget)) container.classList.remove('drag-over'); };
+      container.ondrop      = e => { e.preventDefault(); container.classList.remove('drag-over'); dropCard(col); };
+    });
+  }
+
+  function esc(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // ── Drag & Drop ─────────────────────────────────────────────────────────────
+
+  function onDragStart(e, id) {
+    dragId = id;
+    setTimeout(() => document.getElementById('card-' + id)?.classList.add('dragging'), 0);
+  }
+
+  function onDragEnd() {
+    document.querySelectorAll('.card').forEach(c => c.classList.remove('dragging'));
+    document.querySelectorAll('.cards').forEach(c => c.classList.remove('drag-over'));
+  }
+
+  function dropCard(col) {
+    if (dragId == null) return;
+    const card = cards.find(c => c.id === dragId);
+    if (card && card.col !== col) { card.col = col; render(); scheduleSave(); }
+    dragId = null;
+  }
+
+  // ── Modal ───────────────────────────────────────────────────────────────────
+
+  function openModal(id = null) {
+    editId = id;
+    const card = id ? cards.find(c => c.id === id) : null;
+    document.getElementById('modal-title').textContent = id ? 'Edit Card' : 'Add Card';
+    document.getElementById('f-title').value = card?.title || '';
+    document.getElementById('f-desc').value  = card?.desc  || '';
+    document.getElementById('f-icon').value  = card?.icon  || '';
+    document.getElementById('f-col').value   = card?.col   || 'todo';
+    document.getElementById('modal-bg').classList.add('open');
+    setTimeout(() => document.getElementById('f-title').focus(), 50);
+  }
+
+  function closeModal() {
+    document.getElementById('modal-bg').classList.remove('open');
+    editId = null;
+  }
+
+  function handleBgClick(e) {
+    if (e.target === document.getElementById('modal-bg')) closeModal();
+  }
+
+  function saveCard() {
+    const title = document.getElementById('f-title').value.trim();
+    if (!title) { document.getElementById('f-title').focus(); return; }
+    const col  = document.getElementById('f-col').value;
+    const desc = document.getElementById('f-desc').value.trim();
+    const icon = document.getElementById('f-icon').value.trim();
+
+    if (editId) {
+      const card = cards.find(c => c.id === editId);
+      if (card) Object.assign(card, { title, desc, icon, col });
+    } else {
+      cards.push({ id: nextId++, title, desc, icon, col });
+    }
+    render(); closeModal(); scheduleSave();
+  }
+
+  function editCard(id) { openModal(id); }
+
+  function deleteCard(id) {
+    cards = cards.filter(c => c.id !== id);
+    render(); scheduleSave();
+  }
+
+  // ── Keyboard ─────────────────────────────────────────────────────────────────
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeModal();
+    if (e.key === 'Enter' && e.ctrlKey && document.getElementById('modal-bg').classList.contains('open')) saveCard();
+  });
+
+  // ── Init ─────────────────────────────────────────────────────────────────────
+
+  fetch('/api/me').then(r => r.json()).then(user => {
+    if (user.photo) {
+      const img = document.getElementById('user-avatar');
+      img.src = user.photo;
+      img.alt = user.name;
+      img.style.display = 'block';
+    }
+  }).catch(() => {});
+
+  loadCards();
+</script>
+</body>
+</html>
