@@ -5,6 +5,33 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI Assistant Tasks</title>
 <style>
+  #lock-screen {
+    position: fixed; inset: 0; background: #0d1117;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 9999;
+  }
+  #lock-screen.hidden { display: none; }
+  .lock-box {
+    background: #161b22; border: 1px solid #30363d;
+    border-radius: 14px; padding: 36px 32px; width: 320px; text-align: center;
+  }
+  .lock-box h2 { color: #f0f6fc; margin-bottom: 8px; font-size: 1.1rem; }
+  .lock-box p { color: #8b949e; font-size: 0.82rem; margin-bottom: 20px; }
+  .lock-box input {
+    width: 100%; background: #0d1117; border: 1px solid #30363d;
+    border-radius: 8px; color: #e6edf3; padding: 10px 12px;
+    font-size: 0.9rem; outline: none; margin-bottom: 12px;
+  }
+  .lock-box input:focus { border-color: #58a6ff; }
+  .lock-box button {
+    width: 100%; background: #238636; color: #fff; border: none;
+    padding: 10px; border-radius: 8px; font-size: 0.9rem;
+    font-weight: 500; cursor: pointer;
+  }
+  .lock-box button:hover { background: #2ea043; }
+  .lock-error { color: #f85149; font-size: 0.8rem; margin-top: 8px; display: none; }
+</style>
+<style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
@@ -303,6 +330,16 @@
 </head>
 <body>
 
+<div id="lock-screen">
+  <div class="lock-box">
+    <h2>🔒 AI Assistant Tasks</h2>
+    <p>Enter password to continue</p>
+    <input type="password" id="pw-input" placeholder="Password" onkeydown="if(event.key==='Enter')unlock()" />
+    <button onclick="unlock()">Unlock</button>
+    <div class="lock-error" id="pw-error">Incorrect password</div>
+  </div>
+</div>
+
 <header>
   <h1>🤖 <span>AI Assistant</span> Tasks</h1>
   <button class="add-btn" onclick="openModal()">＋ Add Card</button>
@@ -486,6 +523,31 @@
     if (e.key === 'Escape') closeModal();
     if ((e.key === 'Enter') && document.getElementById('modal-bg').classList.contains('open') && e.ctrlKey) saveCard();
   });
+
+  // Password lock
+  const PW_HASH = '7a4f3c2e1d8b6a5e9f0c3b2a1d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2'; // placeholder
+  function strHash(s) {
+    // simple check: compare directly (stored as btoa)
+    return btoa(s);
+  }
+  const CORRECT = btoa('fu3432672');
+  function unlock() {
+    const val = document.getElementById('pw-input').value;
+    if (btoa(val) === CORRECT) {
+      sessionStorage.setItem('kanban-auth', '1');
+      document.getElementById('lock-screen').classList.add('hidden');
+    } else {
+      document.getElementById('pw-error').style.display = 'block';
+      document.getElementById('pw-input').value = '';
+      document.getElementById('pw-input').focus();
+    }
+  }
+  if (sessionStorage.getItem('kanban-auth') !== '1') {
+    // show lock screen (already visible by default)
+    setTimeout(() => document.getElementById('pw-input').focus(), 100);
+  } else {
+    document.getElementById('lock-screen').classList.add('hidden');
+  }
 
   render();
 </script>
