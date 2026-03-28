@@ -56,9 +56,7 @@
     letter-spacing: -0.01em;
   }
 
-  header h1 span {
-    color: #58a6ff;
-  }
+  header h1 span { color: #58a6ff; }
 
   .add-btn {
     background: #238636;
@@ -74,12 +72,11 @@
     gap: 6px;
     transition: background 0.15s;
   }
-
   .add-btn:hover { background: #2ea043; }
 
   .board {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 20px;
     align-items: start;
   }
@@ -111,14 +108,13 @@
   }
 
   .column-title .dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
+    width: 8px; height: 8px; border-radius: 50%;
   }
 
-  #col-todo .dot    { background: #8b949e; }
+  #col-todo .dot     { background: #8b949e; }
   #col-progress .dot { background: #f0883e; }
-  #col-done .dot    { background: #3fb950; }
+  #col-done .dot     { background: #3fb950; }
+  #col-ideas .dot    { background: #a371f7; }
 
   .count {
     background: #21262d;
@@ -193,7 +189,28 @@
     color: #8b949e;
     line-height: 1.5;
     margin-left: calc(1.2rem + 10px);
+    margin-bottom: 6px;
   }
+
+  .card-label {
+    display: inline-block;
+    font-size: 0.68rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-left: calc(1.2rem + 10px);
+    margin-top: 2px;
+  }
+
+  /* Label colors per project */
+  .label-extended    { background: #1f3b5e; color: #58a6ff; }
+  .label-onepost     { background: #1f3b2e; color: #3fb950; }
+  .label-voicetyper  { background: #3b2e1f; color: #f0883e; }
+  .label-website     { background: #2e1f3b; color: #a371f7; }
+  .label-ondogjustice{ background: #3b1f1f; color: #f85149; }
+  .label-softmiles   { background: #1f3b3b; color: #39d0d8; }
+  .label-crashlab    { background: #3b3b1f; color: #e3b341; }
+  .label-general     { background: #21262d; color: #8b949e; }
 
   .card-actions {
     position: absolute;
@@ -210,8 +227,7 @@
     border: none;
     color: #8b949e;
     border-radius: 5px;
-    width: 22px;
-    height: 22px;
+    width: 22px; height: 22px;
     font-size: 0.7rem;
     cursor: pointer;
     display: flex;
@@ -233,7 +249,6 @@
     align-items: center;
     justify-content: center;
   }
-
   .modal-bg.open { display: flex; }
 
   .modal {
@@ -252,9 +267,7 @@
     color: #f0f6fc;
   }
 
-  .form-group {
-    margin-bottom: 14px;
-  }
+  .form-group { margin-bottom: 14px; }
 
   .form-group label {
     display: block;
@@ -281,12 +294,9 @@
 
   .form-group input:focus,
   .form-group textarea:focus,
-  .form-group select:focus {
-    border-color: #58a6ff;
-  }
+  .form-group select:focus { border-color: #58a6ff; }
 
   .form-group textarea { resize: vertical; min-height: 70px; }
-
   .form-group select option { background: #161b22; }
 
   .modal-actions {
@@ -306,7 +316,6 @@
     cursor: pointer;
     transition: border-color 0.15s;
   }
-
   .btn-cancel:hover { border-color: #58a6ff; color: #e6edf3; }
 
   .btn-save {
@@ -320,10 +329,12 @@
     cursor: pointer;
     transition: background 0.15s;
   }
-
   .btn-save:hover { background: #2ea043; }
 
-  @media (max-width: 680px) {
+  @media (max-width: 900px) {
+    .board { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 500px) {
     .board { grid-template-columns: 1fr; }
   }
 </style>
@@ -369,6 +380,14 @@
     </div>
     <div class="cards" id="cards-done"></div>
   </div>
+
+  <div class="column" id="col-ideas">
+    <div class="column-header">
+      <span class="column-title"><span class="dot"></span>Ideas</span>
+      <span class="count" id="count-ideas">0</span>
+    </div>
+    <div class="cards" id="cards-ideas"></div>
+  </div>
 </div>
 
 <!-- Add/Edit Modal -->
@@ -388,11 +407,26 @@
       <input type="text" id="f-icon" placeholder="e.g. 🎙️ or leave blank" maxlength="4" />
     </div>
     <div class="form-group">
+      <label>Project</label>
+      <select id="f-project">
+        <option value="">— None —</option>
+        <option value="extended">Extended</option>
+        <option value="onepost">One Post</option>
+        <option value="voicetyper">Voice Typer</option>
+        <option value="website">Personal Website</option>
+        <option value="ondogjustice">On the Dog Justice</option>
+        <option value="softmiles">Soft Miles</option>
+        <option value="crashlab">Crash Lab</option>
+        <option value="general">General</option>
+      </select>
+    </div>
+    <div class="form-group">
       <label>Column</label>
       <select id="f-col">
         <option value="todo">Todo</option>
         <option value="progress">In Progress</option>
         <option value="done">Done</option>
+        <option value="ideas">Ideas</option>
       </select>
     </div>
     <div class="modal-actions">
@@ -403,15 +437,30 @@
 </div>
 
 <script>
+  const PROJECT_LABELS = {
+    extended:     { label: 'Extended',           cls: 'label-extended' },
+    onepost:      { label: 'One Post',            cls: 'label-onepost' },
+    voicetyper:   { label: 'Voice Typer',         cls: 'label-voicetyper' },
+    website:      { label: 'Personal Website',    cls: 'label-website' },
+    ondogjustice: { label: 'On the Dog Justice',  cls: 'label-ondogjustice' },
+    softmiles:    { label: 'Soft Miles',          cls: 'label-softmiles' },
+    crashlab:     { label: 'Crash Lab',           cls: 'label-crashlab' },
+    general:      { label: 'General',             cls: 'label-general' },
+  };
+
   const INITIAL_DATA = [
-    { id: 1, title: "Set up voice transcription", desc: "Integrate microphone input with Whisper or system STT API", icon: "🎙️", col: "done" },
-    { id: 2, title: "Take desktop screenshot", desc: "Capture full screen or selection on demand", icon: "📸", col: "done" },
-    { id: 3, title: "Calendar event parser", desc: "Read and summarize upcoming events from calendar", icon: "📅", col: "todo" },
-    { id: 4, title: "Web search integration", desc: "Connect to search API for real-time lookup", icon: "🔍", col: "progress" },
-    { id: 5, title: "File system watcher", desc: "Monitor directories for new or changed files", icon: "📁", col: "progress" },
-    { id: 6, title: "Clipboard monitor", desc: "Watch clipboard and act on copied content", icon: "📋", col: "done" },
-    { id: 7, title: "Shell command executor", desc: "Run terminal commands and capture output", icon: "⚙️", col: "done" },
-    { id: 8, title: "Install ffmpeg (arm64)", desc: "", icon: "🎞️", col: "done" },
+    { id: 1, title: "Set up voice transcription", desc: "Integrate microphone input with Whisper or system STT API", icon: "🎙️", col: "done", project: "" },
+    { id: 2, title: "Take desktop screenshot", desc: "Capture full screen or selection on demand", icon: "📸", col: "done", project: "" },
+    { id: 3, title: "Calendar event parser", desc: "Read and summarize upcoming events from calendar", icon: "📅", col: "todo", project: "" },
+    { id: 4, title: "Web search integration", desc: "Connect to search API for real-time lookup", icon: "🔍", col: "progress", project: "" },
+    { id: 5, title: "File system watcher", desc: "Monitor directories for new or changed files", icon: "📁", col: "progress", project: "" },
+    { id: 6, title: "Clipboard monitor", desc: "Watch clipboard and act on copied content", icon: "📋", col: "done", project: "" },
+    { id: 7, title: "Shell command executor", desc: "Run terminal commands and capture output", icon: "⚙️", col: "done", project: "" },
+    { id: 8, title: "Install ffmpeg (arm64)", desc: "", icon: "🎞️", col: "done", project: "" },
+    { id: 9, title: "Gmail integration", desc: "Read and send emails via Gmail API", icon: "📧", col: "done", project: "" },
+    { id: 10, title: "GitHub integration", desc: "Push/pull repos, create repos via gh CLI", icon: "🐙", col: "done", project: "" },
+    { id: 11, title: "Kanban board", desc: "Public board with password protection and Ideas column", icon: "📋", col: "done", project: "" },
+    { id: 12, title: "Note-taking skill", desc: "Voice/text ideas saved and shown on board", icon: "💡", col: "done", project: "" },
   ];
 
   let cards = JSON.parse(localStorage.getItem('kanban-cards') || 'null') || INITIAL_DATA;
@@ -424,10 +473,12 @@
   }
 
   function render() {
-    ['todo', 'progress', 'done'].forEach(col => {
+    ['todo', 'progress', 'done', 'ideas'].forEach(col => {
       const container = document.getElementById('cards-' + col);
       const colCards = cards.filter(c => c.col === col);
-      container.innerHTML = colCards.map(card => `
+      container.innerHTML = colCards.map(card => {
+        const proj = card.project && PROJECT_LABELS[card.project];
+        return `
         <div class="card" id="card-${card.id}"
           draggable="true"
           ondragstart="onDragStart(event, ${card.id})"
@@ -441,11 +492,11 @@
             <span class="card-title">${esc(card.title)}</span>
           </div>
           ${card.desc ? `<p class="card-desc">${esc(card.desc)}</p>` : ''}
-        </div>
-      `).join('');
+          ${proj ? `<span class="card-label ${proj.cls}">${proj.label}</span>` : ''}
+        </div>`;
+      }).join('');
       document.getElementById('count-' + col).textContent = colCards.length;
 
-      // Drop zone events
       container.ondragover = e => { e.preventDefault(); container.classList.add('drag-over'); };
       container.ondragleave = e => { if (!container.contains(e.relatedTarget)) container.classList.remove('drag-over'); };
       container.ondrop = e => { e.preventDefault(); container.classList.remove('drag-over'); dropCard(col); };
@@ -473,7 +524,6 @@
     dragId = null;
   }
 
-  // Modal
   function openModal(id = null) {
     editId = id;
     const card = id ? cards.find(c => c.id === id) : null;
@@ -481,6 +531,7 @@
     document.getElementById('f-title').value = card?.title || '';
     document.getElementById('f-desc').value = card?.desc || '';
     document.getElementById('f-icon').value = card?.icon || '';
+    document.getElementById('f-project').value = card?.project || '';
     document.getElementById('f-col').value = card?.col || 'todo';
     document.getElementById('modal-bg').classList.add('open');
     setTimeout(() => document.getElementById('f-title').focus(), 50);
@@ -498,15 +549,16 @@
   function saveCard() {
     const title = document.getElementById('f-title').value.trim();
     if (!title) { document.getElementById('f-title').focus(); return; }
-    const col  = document.getElementById('f-col').value;
-    const desc = document.getElementById('f-desc').value.trim();
-    const icon = document.getElementById('f-icon').value.trim();
+    const col     = document.getElementById('f-col').value;
+    const desc    = document.getElementById('f-desc').value.trim();
+    const icon    = document.getElementById('f-icon').value.trim();
+    const project = document.getElementById('f-project').value;
 
     if (editId) {
       const card = cards.find(c => c.id === editId);
-      if (card) Object.assign(card, { title, desc, icon, col });
+      if (card) Object.assign(card, { title, desc, icon, col, project });
     } else {
-      cards.push({ id: nextId++, title, desc, icon, col });
+      cards.push({ id: nextId++, title, desc, icon, col, project });
     }
     save(); render(); closeModal();
   }
@@ -518,18 +570,12 @@
     save(); render();
   }
 
-  // Keyboard shortcut: Escape closes modal
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') closeModal();
-    if ((e.key === 'Enter') && document.getElementById('modal-bg').classList.contains('open') && e.ctrlKey) saveCard();
+    if (e.key === 'Enter' && e.ctrlKey && document.getElementById('modal-bg').classList.contains('open')) saveCard();
   });
 
   // Password lock
-  const PW_HASH = '7a4f3c2e1d8b6a5e9f0c3b2a1d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2'; // placeholder
-  function strHash(s) {
-    // simple check: compare directly (stored as btoa)
-    return btoa(s);
-  }
   const CORRECT = btoa('fu3432672');
   function unlock() {
     const val = document.getElementById('pw-input').value;
@@ -543,7 +589,6 @@
     }
   }
   if (sessionStorage.getItem('kanban-auth') !== '1') {
-    // show lock screen (already visible by default)
     setTimeout(() => document.getElementById('pw-input').focus(), 100);
   } else {
     document.getElementById('lock-screen').classList.add('hidden');
