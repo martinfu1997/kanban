@@ -461,10 +461,11 @@
     { id: 10, title: "GitHub integration", desc: "Push/pull repos, create repos via gh CLI", icon: "🐙", col: "done", project: "" },
     { id: 11, title: "Kanban board", desc: "Public board with password protection and Ideas column", icon: "📋", col: "done", project: "" },
     { id: 12, title: "Note-taking skill", desc: "Voice/text ideas saved and shown on board", icon: "💡", col: "done", project: "" },
+    { id: 13, title: "Audio Fix Studio", desc: "Web app: upload audio, fix mistakes via voice clone (ElevenLabs), download corrected audio. Public app.", icon: "🎙️", col: "ideas", project: "general" },
   ];
 
   let cards = JSON.parse(localStorage.getItem('kanban-cards') || 'null') || INITIAL_DATA;
-  let nextId = Math.max(...cards.map(c => c.id), 0) + 1;
+  // nextId computed belowcards.map(c => c.id), 0) + 1;
   let editId = null;
   let dragId = null;
 
