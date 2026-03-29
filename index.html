@@ -568,6 +568,17 @@
   }
   .prompt-add-btn:hover { border-color: #58a6ff; color: #58a6ff; }
 
+  .prompt-scroll {
+    max-height: 55vh;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #30363d transparent;
+  }
+  .prompt-scroll::-webkit-scrollbar { width: 5px; }
+  .prompt-scroll::-webkit-scrollbar-track { background: transparent; }
+  .prompt-scroll::-webkit-scrollbar-thumb { background: #30363d; border-radius: 4px; }
+  .prompt-scroll::-webkit-scrollbar-thumb:hover { background: #484f58; }
+
   @media (max-width: 900px) {
     .prompts-board { grid-template-columns: 1fr; }
   }
@@ -687,21 +698,21 @@
     <div class="prompt-column-header">
       <span class="prompt-column-title brand-underdogjustice">⚖️ Underdog Justice</span>
     </div>
-    <div id="prompts-underdogjustice"></div>
+    <div class="prompt-scroll" id="prompts-underdogjustice"></div>
     <button class="prompt-add-btn" onclick="addPrompt('underdogjustice')">＋ Add Prompt</button>
   </div>
   <div class="prompt-column">
     <div class="prompt-column-header">
       <span class="prompt-column-title brand-crashlab">🏎️ Crash Lab</span>
     </div>
-    <div id="prompts-crashlab"></div>
+    <div class="prompt-scroll" id="prompts-crashlab"></div>
     <button class="prompt-add-btn" onclick="addPrompt('crashlab')">＋ Add Prompt</button>
   </div>
   <div class="prompt-column">
     <div class="prompt-column-header">
       <span class="prompt-column-title brand-softmiles">🌿 Soft Miles</span>
     </div>
-    <div id="prompts-softmiles"></div>
+    <div class="prompt-scroll" id="prompts-softmiles"></div>
     <button class="prompt-add-btn" onclick="addPrompt('softmiles')">＋ Add Prompt</button>
   </div>
 </div>
