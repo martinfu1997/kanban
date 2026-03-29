@@ -1050,24 +1050,22 @@
       document.getElementById('status-last-checked').textContent = 'Last checked: ' + data._lastChecked;
     }
   }
-  // ── Inject latest known status on first load ───────────────────
-  (function seedInitialData() {
-    if (!localStorage.getItem('kanban-site-status')) {
-      localStorage.setItem('kanban-site-status', JSON.stringify({
-        voicetyper: { ok: true, time: "2026-03-29 21:18" },
-        onepost: { ok: true, time: "2026-03-29 21:18" },
-        extended: { ok: true, time: "2026-03-29 21:18" },
-        kanban: { ok: true, time: "2026-03-29 21:18" },
-        audiofixstudio: { ok: true, time: "2026-03-29 21:18" },
-        _lastChecked: "2026-03-29 21:18"
-      }));
-    }
-    if (!localStorage.getItem('kanban-report-times')) {
-      localStorage.setItem('kanban-report-times', JSON.stringify({
-        evening: "2026-03-29 21:00"
-      }));
-    }
-  })();
+  // ── Force-update status data to latest known values ───────────
+  const DATA_VERSION = '20260329-2';
+  if (localStorage.getItem('kanban-data-version') !== DATA_VERSION) {
+    localStorage.setItem('kanban-site-status', JSON.stringify({
+      voicetyper: { ok: true, time: "2026-03-29 21:18" },
+      onepost: { ok: true, time: "2026-03-29 21:18" },
+      extended: { ok: true, time: "2026-03-29 21:18" },
+      kanban: { ok: true, time: "2026-03-29 21:18" },
+      audiofixstudio: { ok: true, time: "2026-03-29 21:18" },
+      _lastChecked: "2026-03-29 21:18"
+    }));
+    localStorage.setItem('kanban-report-times', JSON.stringify({
+      evening: "2026-03-29 21:00"
+    }));
+    localStorage.setItem('kanban-data-version', DATA_VERSION);
+  }
 
   renderSiteStatus();
 
