@@ -338,6 +338,51 @@
     .board { grid-template-columns: 1fr; }
   }
 
+  /* Site Status Section */
+  .site-status-board {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 14px;
+    margin-bottom: 8px;
+  }
+
+  .site-status-card {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 10px;
+    padding: 14px;
+  }
+
+  .site-name {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #f0f6fc;
+    margin-bottom: 4px;
+  }
+
+  .site-url {
+    font-size: 0.7rem;
+    color: #8b949e;
+    margin-bottom: 10px;
+    word-break: break-all;
+  }
+
+  .site-badge {
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 10px;
+    display: inline-block;
+  }
+
+  .site-badge.ok      { background: #1f3b2e; color: #3fb950; }
+  .site-badge.down    { background: #3d1f22; color: #f85149; }
+  .site-badge.unknown { background: #21262d; color: #8b949e; }
+
+  @media (max-width: 900px) {
+    .site-status-board { grid-template-columns: repeat(2, 1fr); }
+  }
+
   /* Daily Tasks Section */
   .daily-tasks-board {
     display: grid;
@@ -565,6 +610,36 @@
       <span class="count" id="count-ideas">0</span>
     </div>
     <div class="cards" id="cards-ideas"></div>
+  </div>
+</div>
+
+<!-- Site Status Section -->
+<div class="section-title">🌐 Website Status <span id="status-last-checked"></span></div>
+<div class="site-status-board" id="site-status-board">
+  <div class="site-status-card" id="site-voicetyper">
+    <div class="site-name">🎙️ Voice Typer</div>
+    <div class="site-url">voicetyper.app</div>
+    <div class="site-badge unknown">⬤ Unknown</div>
+  </div>
+  <div class="site-status-card" id="site-onepost">
+    <div class="site-name">📤 One Post</div>
+    <div class="site-url">onepost.app</div>
+    <div class="site-badge unknown">⬤ Unknown</div>
+  </div>
+  <div class="site-status-card" id="site-extended">
+    <div class="site-name">🖥️ Extended</div>
+    <div class="site-url">extendedapp.io</div>
+    <div class="site-badge unknown">⬤ Unknown</div>
+  </div>
+  <div class="site-status-card" id="site-kanban">
+    <div class="site-name">📋 Kanban Board</div>
+    <div class="site-url">martinfu1997.github.io/kanban</div>
+    <div class="site-badge unknown">⬤ Unknown</div>
+  </div>
+  <div class="site-status-card" id="site-audiofixstudio">
+    <div class="site-name">🎵 Audio Fix Studio</div>
+    <div class="site-url">martinfu1997.github.io/audio-fix-studio</div>
+    <div class="site-badge unknown">⬤ Unknown</div>
   </div>
 </div>
 
@@ -917,6 +992,26 @@
   }
 
   renderPrompts();
+
+  // ── Site Status ──────────────────────────────────────────────
+  function renderSiteStatus() {
+    const data = JSON.parse(localStorage.getItem('kanban-site-status') || '{}');
+    const sites = ['voicetyper','onepost','extended','kanban','audiofixstudio'];
+    sites.forEach(id => {
+      const card = document.getElementById('site-' + id);
+      if (!card) return;
+      const badge = card.querySelector('.site-badge');
+      const info = data[id];
+      if (info) {
+        badge.className = 'site-badge ' + (info.ok ? 'ok' : 'down');
+        badge.textContent = (info.ok ? '⬤ Online' : '⬤ Down') + ' — ' + info.time;
+      }
+    });
+    if (data._lastChecked) {
+      document.getElementById('status-last-checked').textContent = 'Last checked: ' + data._lastChecked;
+    }
+  }
+  renderSiteStatus();
 </script>
 </body>
 </html>
