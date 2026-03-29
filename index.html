@@ -203,6 +203,13 @@
     margin-bottom: 6px;
   }
 
+  .card-time {
+    font-size: 0.68rem;
+    color: #484f58;
+    margin-left: calc(1.2rem + 10px);
+    margin-top: 4px;
+  }
+
   .card-label {
     display: inline-block;
     font-size: 0.68rem;
@@ -451,6 +458,12 @@
     color: #3fb950;
   }
 
+  .daily-task-last {
+    font-size: 0.68rem;
+    color: #484f58;
+    margin-top: 8px;
+  }
+
   @media (max-width: 600px) {
     .daily-tasks-board { grid-template-columns: 1fr; }
   }
@@ -675,8 +688,10 @@
       <li>🔥 Viral AI news with direct source links</li>
       <li>🌐 Website status check</li>
       <li>👥 Communities worth joining</li>
+      <li>💬 Suggestions</li>
     </ul>
     <div class="daily-task-badge active">● Active</div>
+    <div class="daily-task-last" id="last-morning">🕐 Last sent: —</div>
   </div>
   <div class="daily-task-card">
     <div class="daily-task-time">🌙 10:00 PM</div>
@@ -686,8 +701,10 @@
       <li>📈 Trending posts (Twitter/X, Instagram)</li>
       <li>🌐 Website status check</li>
       <li>👥 Community pick</li>
+      <li>💬 Suggestions</li>
     </ul>
     <div class="daily-task-badge active">● Active</div>
+    <div class="daily-task-last" id="last-evening">🕐 Last sent: —</div>
   </div>
 </div>
 
@@ -777,14 +794,14 @@
 
   const INITIAL_DATA = [
 
-    { id: 103, title: "Voice Message Transcription", desc: "Transcribe voice messages via Whisper and respond naturally", icon: "🎙️", col: "done", project: "general" },
-    { id: 104, title: "Kanban Board Management", desc: "Add, update, and manage tasks on the Kanban board via GitHub", icon: "📋", col: "done", project: "general" },
-    { id: 105, title: "AI Video Prompt Generator", desc: "Generate optimized Chinese prompts for Seedance by brand (Underdog Justice, Crashlab, Soft Miles)", icon: "🎬", col: "done", project: "general" },
-    { id: 106, title: "Gmail Integration", desc: "Read, search, send, and reply to emails via Gmail API", icon: "📧", col: "done", project: "general" },
-    { id: 107, title: "Web Search", desc: "Search the web for real-time information, news, and trends", icon: "🔍", col: "done", project: "general" },
-    { id: 108, title: "Screen Automation (Peekaboo)", desc: "Control macOS UI — take screenshots, click buttons, automate web tasks", icon: "🖥️", col: "done", project: "general" },
-    { id: 109, title: "Google Drive Monitor", desc: "Watch local Google Drive folder for new or changed files", icon: "📁", col: "done", project: "general" },
-    { id: 110, title: "Claude Code Delegation", desc: "Delegate complex coding/debugging tasks to Claude Code CLI", icon: "🤖", col: "done", project: "general" },
+    { id: 103, title: "Voice Message Transcription", desc: "Transcribe voice messages via Whisper and respond naturally", icon: "🎙️", col: "done", project: "general", updatedAt: "2026-03-29" },
+    { id: 104, title: "Kanban Board Management", desc: "Add, update, and manage tasks on the Kanban board via GitHub", icon: "📋", col: "done", project: "general", updatedAt: "2026-03-29" },
+    { id: 105, title: "AI Video Prompt Generator", desc: "Generate optimized Chinese prompts for Seedance by brand (Underdog Justice, Crashlab, Soft Miles)", icon: "🎬", col: "done", project: "general", updatedAt: "2026-03-29" },
+    { id: 106, title: "Gmail Integration", desc: "Read, search, send, and reply to emails via Gmail API", icon: "📧", col: "done", project: "general", updatedAt: "2026-03-29" },
+    { id: 107, title: "Web Search", desc: "Search the web for real-time information, news, and trends", icon: "🔍", col: "done", project: "general", updatedAt: "2026-03-29" },
+    { id: 108, title: "Screen Automation (Peekaboo)", desc: "Control macOS UI — take screenshots, click buttons, automate web tasks", icon: "🖥️", col: "done", project: "general", updatedAt: "2026-03-29" },
+    { id: 109, title: "Google Drive Monitor", desc: "Watch local Google Drive folder for new or changed files", icon: "📁", col: "done", project: "general", updatedAt: "2026-03-29" },
+    { id: 110, title: "Claude Code Delegation", desc: "Delegate complex coding/debugging tasks to Claude Code CLI", icon: "🤖", col: "done", project: "general", updatedAt: "2026-03-29" },
     { id: 1, title: "Set up voice transcription", desc: "Integrate microphone input with Whisper or system STT API", icon: "🎙️", col: "done", project: "" },
     { id: 2, title: "Take desktop screenshot", desc: "Capture full screen or selection on demand", icon: "📸", col: "done", project: "" },
     { id: 3, title: "Calendar event parser", desc: "Read and summarize upcoming events from calendar", icon: "📅", col: "todo", project: "" },
@@ -797,7 +814,7 @@
     { id: 10, title: "GitHub integration", desc: "Push/pull repos, create repos via gh CLI", icon: "🐙", col: "done", project: "" },
     { id: 11, title: "Kanban board", desc: "Public board with password protection and Ideas column", icon: "📋", col: "done", project: "" },
     { id: 12, title: "Note-taking skill", desc: "Voice/text ideas saved and shown on board", icon: "💡", col: "done", project: "" },
-    { id: 13, title: "Audio Fix Studio v1.2", desc: "v1.2: Groq Whisper transcription, Record Replacement (own voice), fixed scrolling, per-section playback. Live: martinfu1997.github.io/audio-fix-studio/", icon: "🎙️", col: "done", project: "general" },
+    { id: 13, title: "Audio Fix Studio v1.2", desc: "v1.2: Groq Whisper transcription, Record Replacement (own voice), fixed scrolling, per-section playback. Live: martinfu1997.github.io/audio-fix-studio/", icon: "🎙️", col: "done", project: "general", updatedAt: "2026-03-29" },
   ];
 
   // Merge stored cards with INITIAL_DATA — always sync cards from INITIAL_DATA by id
@@ -839,6 +856,7 @@
           </div>
           ${card.desc ? `<p class="card-desc">${esc(card.desc)}</p>` : ''}
           ${proj ? `<span class="card-label ${proj.cls}">${proj.label}</span>` : ''}
+          ${card.updatedAt ? `<div class="card-time">🕐 ${card.updatedAt}</div>` : ''}
         </div>`;
       }).join('');
       document.getElementById('count-' + col).textContent = colCards.length;
@@ -1033,6 +1051,18 @@
     }
   }
   renderSiteStatus();
+
+  // ── Report timestamps ──────────────────────────────────────────
+  const reportTimes = JSON.parse(localStorage.getItem('kanban-report-times') || '{}');
+  if (reportTimes.morning) document.getElementById('last-morning').textContent = '🕐 Last sent: ' + reportTimes.morning;
+  if (reportTimes.evening) document.getElementById('last-evening').textContent = '🕐 Last sent: ' + reportTimes.evening;
+
+  // ── Prompt section timestamp ────────────────────────────────────
+  const promptMeta = JSON.parse(localStorage.getItem('kanban-prompt-meta') || '{}');
+  if (promptMeta.lastGenerated) {
+    const el = document.querySelector('.section-title');
+    if (el) el.querySelector('span').textContent = 'Click 📋 to copy · ✕ to delete · Last generated: ' + promptMeta.lastGenerated;
+  }
 </script>
 </body>
 </html>
