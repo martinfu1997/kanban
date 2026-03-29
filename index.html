@@ -89,6 +89,17 @@
     min-height: 200px;
   }
 
+  .cards-scroll {
+    max-height: 65vh;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #30363d transparent;
+  }
+  .cards-scroll::-webkit-scrollbar { width: 5px; }
+  .cards-scroll::-webkit-scrollbar-track { background: transparent; }
+  .cards-scroll::-webkit-scrollbar-thumb { background: #30363d; border-radius: 4px; }
+  .cards-scroll::-webkit-scrollbar-thumb:hover { background: #484f58; }
+
   .column-header {
     display: flex;
     align-items: center;
@@ -585,7 +596,7 @@
       <span class="column-title"><span class="dot"></span>Todo</span>
       <span class="count" id="count-todo">0</span>
     </div>
-    <div class="cards" id="cards-todo"></div>
+    <div class="cards cards-scroll" id="cards-todo"></div>
   </div>
 
   <div class="column" id="col-progress">
@@ -593,7 +604,7 @@
       <span class="column-title"><span class="dot"></span>In Progress</span>
       <span class="count" id="count-progress">0</span>
     </div>
-    <div class="cards" id="cards-progress"></div>
+    <div class="cards cards-scroll" id="cards-progress"></div>
   </div>
 
   <div class="column" id="col-done">
@@ -601,7 +612,7 @@
       <span class="column-title"><span class="dot"></span>Done</span>
       <span class="count" id="count-done">0</span>
     </div>
-    <div class="cards" id="cards-done"></div>
+    <div class="cards cards-scroll" id="cards-done"></div>
   </div>
 
   <div class="column" id="col-ideas">
@@ -609,7 +620,7 @@
       <span class="column-title"><span class="dot"></span>Ideas</span>
       <span class="count" id="count-ideas">0</span>
     </div>
-    <div class="cards" id="cards-ideas"></div>
+    <div class="cards cards-scroll" id="cards-ideas"></div>
   </div>
 </div>
 
