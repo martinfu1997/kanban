@@ -651,6 +651,11 @@
 <!-- Site Status Section -->
 <div class="section-title">🌐 Website Status <span id="status-last-checked"></span></div>
 <div class="site-status-board" id="site-status-board">
+  <div class="site-status-card" id="site-extended">
+    <div class="site-name">🖥️ Extended</div>
+    <div class="site-url">frankfu0714-cyber.github.io/extendpad-privacy</div>
+    <div class="site-badge unknown">⬤ Unknown</div>
+  </div>
   <div class="site-status-card" id="site-onepost">
     <div class="site-name">📤 One Post</div>
     <div class="site-url">onepost-lovat.vercel.app</div>
@@ -1031,7 +1036,7 @@
   // ── Site Status ──────────────────────────────────────────────
   function renderSiteStatus() {
     const data = JSON.parse(localStorage.getItem('kanban-site-status') || '{}');
-    const sites = ['onepost','videoessay','kanban','audiofixstudio'];
+    const sites = ['extended','onepost','videoessay','kanban','audiofixstudio'];
     sites.forEach(id => {
       const card = document.getElementById('site-' + id);
       if (!card) return;
@@ -1047,14 +1052,15 @@
     }
   }
   // ── Force-update status data to latest known values ───────────
-  const DATA_VERSION = '20260329-3';
+  const DATA_VERSION = '20260329-4';
   if (localStorage.getItem('kanban-data-version') !== DATA_VERSION) {
     localStorage.setItem('kanban-site-status', JSON.stringify({
-      onepost: { ok: true, time: "2026-03-29 21:37" },
-      videoessay: { ok: true, time: "2026-03-29 21:37" },
-      kanban: { ok: true, time: "2026-03-29 21:37" },
-      audiofixstudio: { ok: true, time: "2026-03-29 21:37" },
-      _lastChecked: "2026-03-29 21:37"
+      extended: { ok: true, time: "2026-03-29 21:43" },
+      onepost: { ok: true, time: "2026-03-29 21:43" },
+      videoessay: { ok: true, time: "2026-03-29 21:43" },
+      kanban: { ok: true, time: "2026-03-29 21:43" },
+      audiofixstudio: { ok: true, time: "2026-03-29 21:43" },
+      _lastChecked: "2026-03-29 21:43"
     }));
     localStorage.setItem('kanban-report-times', JSON.stringify({
       evening: "2026-03-29 21:00"
