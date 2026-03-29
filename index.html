@@ -651,19 +651,14 @@
 <!-- Site Status Section -->
 <div class="section-title">🌐 Website Status <span id="status-last-checked"></span></div>
 <div class="site-status-board" id="site-status-board">
-  <div class="site-status-card" id="site-voicetyper">
-    <div class="site-name">🎙️ Voice Typer</div>
-    <div class="site-url">voicetyper.app</div>
-    <div class="site-badge unknown">⬤ Unknown</div>
-  </div>
   <div class="site-status-card" id="site-onepost">
     <div class="site-name">📤 One Post</div>
-    <div class="site-url">onepost.app</div>
+    <div class="site-url">onepost-lovat.vercel.app</div>
     <div class="site-badge unknown">⬤ Unknown</div>
   </div>
-  <div class="site-status-card" id="site-extended">
-    <div class="site-name">🖥️ Extended</div>
-    <div class="site-url">extendedapp.io</div>
+  <div class="site-status-card" id="site-videoessay">
+    <div class="site-name">🎬 Video Essay Simulator</div>
+    <div class="site-url">frankfu0714-cyber.github.io/Video-Essay-Simulator</div>
     <div class="site-badge unknown">⬤ Unknown</div>
   </div>
   <div class="site-status-card" id="site-kanban">
@@ -794,6 +789,7 @@
 
   const INITIAL_DATA = [
 
+    { id: 114, title: "Video Essay Simulator", desc: "Live: frankfu0714-cyber.github.io/Video-Essay-Simulator/", icon: "🎬", col: "done", project: "general", updatedAt: "2026-03-29" },
     { id: 103, title: "Voice Message Transcription", desc: "Transcribe voice messages via Whisper and respond naturally", icon: "🎙️", col: "done", project: "general", updatedAt: "2026-03-29" },
     { id: 104, title: "Kanban Board Management", desc: "Add, update, and manage tasks on the Kanban board via GitHub", icon: "📋", col: "done", project: "general", updatedAt: "2026-03-29" },
     { id: 105, title: "AI Video Prompt Generator", desc: "Generate optimized Chinese prompts for Seedance by brand (Underdog Justice, Crashlab, Soft Miles)", icon: "🎬", col: "done", project: "general", updatedAt: "2026-03-29" },
@@ -1035,7 +1031,7 @@
   // ── Site Status ──────────────────────────────────────────────
   function renderSiteStatus() {
     const data = JSON.parse(localStorage.getItem('kanban-site-status') || '{}');
-    const sites = ['voicetyper','onepost','extended','kanban','audiofixstudio'];
+    const sites = ['onepost','videoessay','kanban','audiofixstudio'];
     sites.forEach(id => {
       const card = document.getElementById('site-' + id);
       if (!card) return;
@@ -1051,15 +1047,14 @@
     }
   }
   // ── Force-update status data to latest known values ───────────
-  const DATA_VERSION = '20260329-2';
+  const DATA_VERSION = '20260329-3';
   if (localStorage.getItem('kanban-data-version') !== DATA_VERSION) {
     localStorage.setItem('kanban-site-status', JSON.stringify({
-      voicetyper: { ok: true, time: "2026-03-29 21:18" },
-      onepost: { ok: true, time: "2026-03-29 21:18" },
-      extended: { ok: true, time: "2026-03-29 21:18" },
-      kanban: { ok: true, time: "2026-03-29 21:18" },
-      audiofixstudio: { ok: true, time: "2026-03-29 21:18" },
-      _lastChecked: "2026-03-29 21:18"
+      onepost: { ok: true, time: "2026-03-29 21:37" },
+      videoessay: { ok: true, time: "2026-03-29 21:37" },
+      kanban: { ok: true, time: "2026-03-29 21:37" },
+      audiofixstudio: { ok: true, time: "2026-03-29 21:37" },
+      _lastChecked: "2026-03-29 21:37"
     }));
     localStorage.setItem('kanban-report-times', JSON.stringify({
       evening: "2026-03-29 21:00"
