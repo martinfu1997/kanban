@@ -338,6 +338,67 @@
     .board { grid-template-columns: 1fr; }
   }
 
+  /* Daily Tasks Section */
+  .daily-tasks-board {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin-bottom: 8px;
+  }
+
+  .daily-task-card {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 12px;
+    padding: 20px;
+    position: relative;
+  }
+
+  .daily-task-time {
+    font-size: 0.78rem;
+    color: #8b949e;
+    font-weight: 500;
+    margin-bottom: 6px;
+  }
+
+  .daily-task-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #f0f6fc;
+    margin-bottom: 12px;
+  }
+
+  .daily-task-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+
+  .daily-task-list li {
+    font-size: 0.82rem;
+    color: #8b949e;
+    line-height: 1.4;
+  }
+
+  .daily-task-badge {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 10px;
+  }
+
+  .daily-task-badge.active {
+    background: #1f3b2e;
+    color: #3fb950;
+  }
+
+  @media (max-width: 600px) {
+    .daily-tasks-board { grid-template-columns: 1fr; }
+  }
+
   /* Video Prompts Section */
   .section-title {
     font-size: 1rem;
@@ -507,6 +568,32 @@
   </div>
 </div>
 
+<!-- Daily Tasks Section -->
+<div class="section-title">🔁 Daily Tasks <span>Recurring — runs automatically</span></div>
+<div class="daily-tasks-board">
+  <div class="daily-task-card">
+    <div class="daily-task-time">🌅 8:00 AM</div>
+    <div class="daily-task-title">Morning Report</div>
+    <ul class="daily-task-list">
+      <li>🔥 Viral AI news with direct source links</li>
+      <li>🌐 Website status check</li>
+      <li>👥 Communities worth joining</li>
+    </ul>
+    <div class="daily-task-badge active">● Active</div>
+  </div>
+  <div class="daily-task-card">
+    <div class="daily-task-time">🌙 10:00 PM</div>
+    <div class="daily-task-title">Evening Report</div>
+    <ul class="daily-task-list">
+      <li>💡 AI creation ideas & app concepts</li>
+      <li>📈 Trending posts (Twitter/X, Instagram)</li>
+      <li>🌐 Website status check</li>
+      <li>👥 Community pick</li>
+    </ul>
+    <div class="daily-task-badge active">● Active</div>
+  </div>
+</div>
+
 <!-- Video Prompts Section -->
 <div class="section-title">🎬 AI Video Prompts <span>Click 📋 to copy · ✕ to delete</span></div>
 <div class="prompts-board">
@@ -592,8 +679,7 @@
   };
 
   const INITIAL_DATA = [
-    { id: 101, title: "Morning Report (Daily 8AM)", desc: "✅ Viral AI news with source links\n✅ Website status check\n✅ Communities worth joining", icon: "🌅", col: "progress", project: "general" },
-    { id: 102, title: "Evening Report (Daily 10PM)", desc: "✅ AI creation ideas & app concepts\n✅ Trending posts (Twitter/X, Instagram)\n✅ Website status check\n✅ Community pick", icon: "🌙", col: "progress", project: "general" },
+
     { id: 103, title: "Voice Message Transcription", desc: "Transcribe voice messages via Whisper and respond naturally", icon: "🎙️", col: "done", project: "general" },
     { id: 104, title: "Kanban Board Management", desc: "Add, update, and manage tasks on the Kanban board via GitHub", icon: "📋", col: "done", project: "general" },
     { id: 105, title: "AI Video Prompt Generator", desc: "Generate optimized Chinese prompts for Seedance by brand (Underdog Justice, Crashlab, Soft Miles)", icon: "🎬", col: "done", project: "general" },
