@@ -337,6 +337,123 @@
   @media (max-width: 500px) {
     .board { grid-template-columns: 1fr; }
   }
+
+  /* Video Prompts Section */
+  .section-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #f0f6fc;
+    margin: 36px 0 16px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-title span { color: #8b949e; font-size: 0.8rem; font-weight: 400; }
+
+  .prompts-board {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    align-items: start;
+  }
+
+  .prompt-column {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 12px;
+    padding: 16px;
+  }
+
+  .prompt-column-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .prompt-column-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .brand-underdogjustice { color: #f85149; }
+  .brand-softmiles       { color: #39d0d8; }
+  .brand-crashlab        { color: #e3b341; }
+
+  .prompt-card {
+    background: #21262d;
+    border: 1px solid #30363d;
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    font-size: 0.82rem;
+    color: #e6edf3;
+    line-height: 1.5;
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    transition: border-color 0.15s;
+  }
+
+  .prompt-card:hover { border-color: #58a6ff; }
+
+  .prompt-text { flex: 1; }
+
+  .prompt-copy-btn {
+    background: #30363d;
+    border: none;
+    color: #8b949e;
+    border-radius: 5px;
+    width: 26px; height: 26px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.1s, color 0.1s;
+  }
+  .prompt-copy-btn:hover { background: #3d444d; color: #f0f6fc; }
+
+  .prompt-del-btn {
+    background: #30363d;
+    border: none;
+    color: #8b949e;
+    border-radius: 5px;
+    width: 26px; height: 26px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.1s, color 0.1s;
+  }
+  .prompt-del-btn:hover { background: #3d1f22; color: #f85149; }
+
+  .prompt-add-btn {
+    width: 100%;
+    background: transparent;
+    border: 1px dashed #30363d;
+    color: #8b949e;
+    border-radius: 8px;
+    padding: 8px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    margin-top: 4px;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .prompt-add-btn:hover { border-color: #58a6ff; color: #58a6ff; }
+
+  @media (max-width: 900px) {
+    .prompts-board { grid-template-columns: 1fr; }
+  }
 </style>
 </head>
 <body>
@@ -387,6 +504,32 @@
       <span class="count" id="count-ideas">0</span>
     </div>
     <div class="cards" id="cards-ideas"></div>
+  </div>
+</div>
+
+<!-- Video Prompts Section -->
+<div class="section-title">🎬 AI Video Prompts <span>Click 📋 to copy · ✕ to delete</span></div>
+<div class="prompts-board">
+  <div class="prompt-column">
+    <div class="prompt-column-header">
+      <span class="prompt-column-title brand-underdogjustice">⚖️ Underdog Justice</span>
+    </div>
+    <div id="prompts-underdogjustice"></div>
+    <button class="prompt-add-btn" onclick="addPrompt('underdogjustice')">＋ Add Prompt</button>
+  </div>
+  <div class="prompt-column">
+    <div class="prompt-column-header">
+      <span class="prompt-column-title brand-crashlab">🏎️ Crash Lab</span>
+    </div>
+    <div id="prompts-crashlab"></div>
+    <button class="prompt-add-btn" onclick="addPrompt('crashlab')">＋ Add Prompt</button>
+  </div>
+  <div class="prompt-column">
+    <div class="prompt-column-header">
+      <span class="prompt-column-title brand-softmiles">🌿 Soft Miles</span>
+    </div>
+    <div id="prompts-softmiles"></div>
+    <button class="prompt-add-btn" onclick="addPrompt('softmiles')">＋ Add Prompt</button>
   </div>
 </div>
 
@@ -596,6 +739,78 @@
   }
 
   render();
+
+  // ── Video Prompts ──────────────────────────────────────────────
+  const INITIAL_PROMPTS = {
+    underdogjustice: [
+      "A lone figure in a dark courtroom, spotlight cutting through shadows, determined eyes staring at the camera. Cinematic drama, slow zoom in, intense orchestral build. Caption: 'Fighting for the truth.'",
+      "Time-lapse of a city waking up at dawn — streets empty then filling with people. Voiceover: 'Every person deserves a fair chance.' Documentary style, warm golden tones.",
+      "Split screen: one side shows a powerful executive in a glass office tower; the other shows an ordinary person at a kitchen table reading paperwork. Tense, high-contrast lighting. Text overlay: 'The fight isn't over.'",
+      "Slow-motion footage of a gavel striking a podium, ripples spreading outward. Epic cinematic score. End card with logo and tagline: 'Justice for the underdogs.'",
+      "Hands — diverse, worn, young, old — reaching toward each other across a divide. Warm backlighting, emotional ambient music. Caption: 'Together, we stand.'"
+    ],
+    crashlab: [
+      "POV shot from inside a racing car hurtling through a neon-lit tunnel, sparks flying, engine roaring. Ultra fast cuts. Text: 'Push the limit.' Adrenaline electronic music.",
+      "Extreme slow-motion crash test: a car impacts a barrier and crumples, glass exploding in crystalline patterns. Scientific data overlaid. Moody industrial soundtrack.",
+      "Drone aerial shot of a empty track at golden hour, a single car doing donuts, tire smoke rising. Wide angle, cinematic lens flare. No text — pure visuals.",
+      "Side-by-side: engineers working on specs vs. driver gripping the wheel mid-race. Fast intercutting, high tension. Caption: 'Built in the lab. Proven on the track.'",
+      "A car launches off a ramp in slow motion against a twilight sky, rotates 360°, lands perfectly. Epic orchestral hit on landing. Brand logo reveals on impact."
+    ],
+    softmiles: [
+      "Aerial view of a winding road through a misty forest at sunrise. A lone traveler walking slowly, backpack on. Gentle acoustic guitar. Caption: 'Go at your own pace.'",
+      "Close-up of feet stepping on different surfaces: sand, cobblestone, grass, wood floor. Soft ambient sound design. Text: 'Every step tells a story.'",
+      "Time-lapse of clouds drifting over a mountain trail. A hammock sways gently. Minimal lo-fi music. End card: 'Soft Miles — for the quiet adventurers.'",
+      "A traveler sitting at a café window, rain outside, warm light inside, writing in a journal. Cozy cinematic feel, bokeh lights. No dialogue, only ambient sound.",
+      "Hands unfolding a worn paper map on a wooden table, coffee cup nearby, morning light. Slow zoom out to reveal a cozy travel-worn room. Caption: 'The journey is the destination.'"
+    ]
+  };
+
+  let prompts = JSON.parse(localStorage.getItem('kanban-prompts') || 'null') || INITIAL_PROMPTS;
+
+  function savePrompts() {
+    localStorage.setItem('kanban-prompts', JSON.stringify(prompts));
+  }
+
+  function renderPrompts() {
+    ['underdogjustice', 'crashlab', 'softmiles'].forEach(brand => {
+      const container = document.getElementById('prompts-' + brand);
+      const list = prompts[brand] || [];
+      container.innerHTML = list.map((p, i) => `
+        <div class="prompt-card">
+          <span class="prompt-text">${esc(p)}</span>
+          <button class="prompt-copy-btn" onclick="copyPrompt(${i}, '${brand}')" title="Copy">📋</button>
+          <button class="prompt-del-btn" onclick="deletePrompt(${i}, '${brand}')" title="Delete">✕</button>
+        </div>
+      `).join('');
+    });
+  }
+
+  function copyPrompt(i, brand) {
+    const text = prompts[brand][i];
+    navigator.clipboard.writeText(text).then(() => {
+      // brief visual feedback
+      const btns = document.querySelectorAll(`#prompts-${brand} .prompt-copy-btn`);
+      if (btns[i]) { btns[i].textContent = '✓'; setTimeout(() => { btns[i].textContent = '📋'; }, 1200); }
+    });
+  }
+
+  function deletePrompt(i, brand) {
+    prompts[brand].splice(i, 1);
+    savePrompts();
+    renderPrompts();
+  }
+
+  function addPrompt(brand) {
+    const text = prompt('Enter new video prompt:');
+    if (text && text.trim()) {
+      prompts[brand] = prompts[brand] || [];
+      prompts[brand].push(text.trim());
+      savePrompts();
+      renderPrompts();
+    }
+  }
+
+  renderPrompts();
 </script>
 </body>
 </html>
