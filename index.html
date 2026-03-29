@@ -827,11 +827,10 @@
   });
 
   // Password lock
-  const CORRECT = btoa('fu3432672');
   function unlock() {
     const val = document.getElementById('pw-input').value;
-    if (btoa(val) === CORRECT) {
-      sessionStorage.setItem('kanban-auth', '1');
+    if (val === 'fu3432672') {
+      localStorage.setItem('kanban-auth', '1');
       document.getElementById('lock-screen').classList.add('hidden');
     } else {
       document.getElementById('pw-error').style.display = 'block';
@@ -839,7 +838,7 @@
       document.getElementById('pw-input').focus();
     }
   }
-  if (sessionStorage.getItem('kanban-auth') !== '1') {
+  if (localStorage.getItem('kanban-auth') !== '1') {
     setTimeout(() => document.getElementById('pw-input').focus(), 100);
   } else {
     document.getElementById('lock-screen').classList.add('hidden');
