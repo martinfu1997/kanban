@@ -700,11 +700,22 @@
     { id: 10, title: "GitHub integration", desc: "Push/pull repos, create repos via gh CLI", icon: "🐙", col: "done", project: "" },
     { id: 11, title: "Kanban board", desc: "Public board with password protection and Ideas column", icon: "📋", col: "done", project: "" },
     { id: 12, title: "Note-taking skill", desc: "Voice/text ideas saved and shown on board", icon: "💡", col: "done", project: "" },
-    { id: 13, title: "Audio Fix Studio", desc: "Web app: upload audio, fix mistakes via voice clone (ElevenLabs), download corrected audio. Public app.", icon: "🎙️", col: "ideas", project: "general" },
+    { id: 13, title: "Audio Fix Studio", desc: "Web app: upload audio, fix mistakes via voice clone (ElevenLabs), download corrected audio. Public app.", icon: "🎙️", col: "progress", project: "general" },
   ];
 
-  let cards = JSON.parse(localStorage.getItem('kanban-cards') || 'null') || INITIAL_DATA;
-  // nextId computed belowcards.map(c => c.id), 0) + 1;
+  // Merge stored cards with INITIAL_DATA — always sync cards from INITIAL_DATA by id
+  let stored = JSON.parse(localStorage.getItem('kanban-cards') || 'null');
+  let cards;
+  if (!stored) {
+    cards = INITIAL_DATA;
+  } else {
+    // Add any new cards from INITIAL_DATA that don't exist in stored
+    const storedIds = new Set(stored.map(c => c.id));
+    const newCards = INITIAL_DATA.filter(c => !storedIds.has(c.id));
+    cards = [...stored, ...newCards];
+  }
+  let editId = null;
+  let dragId = null;
   let editId = null;
   let dragId = null;
 
