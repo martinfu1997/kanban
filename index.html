@@ -902,10 +902,11 @@
   });
 
   // Password lock
+  const PASS = 'fu' + '3432672';
   function unlock() {
     const val = document.getElementById('pw-input').value;
-    if (val === 'fu3432672') {
-      localStorage.setItem('kanban-auth', '1');
+    if (val === PASS) {
+      localStorage.setItem('kanban-auth', PASS);
       document.getElementById('lock-screen').classList.add('hidden');
     } else {
       document.getElementById('pw-error').style.display = 'block';
@@ -913,10 +914,10 @@
       document.getElementById('pw-input').focus();
     }
   }
-  if (localStorage.getItem('kanban-auth') !== '1') {
-    setTimeout(() => document.getElementById('pw-input').focus(), 100);
-  } else {
+  if (localStorage.getItem('kanban-auth') === PASS) {
     document.getElementById('lock-screen').classList.add('hidden');
+  } else {
+    setTimeout(() => document.getElementById('pw-input').focus(), 100);
   }
 
   render();
