@@ -1,10 +1,10 @@
 {
-  "lastChecked": "2026-03-29T22:01:18Z",
+  "updated": "2026-03-29T23:01:13Z",
   "sites": {
-    "ExtendPad": {"status": "UP", "code": 200},
-    "One Post": {"status": "UP", "code": 307},
-    "Video Essay": {"status": "UP", "code": 200},
-    "Audio Fix Studio": {"status": "UP", "code": 200},
-    "Kanban": {"status": "UP", "code": 200}
+    "ExtendPad": {"status": "up", "code": 200, "url": "https://frankfu0714-cyber.github.io/extendpad-privacy/privacy-policy.html"},
+    "One Post": {"status": "up", "code": 307, "url": "https://onepost-lovat.vercel.app"},
+    "Video Essay": {"status": "up", "code": 200, "url": "https://frankfu0714-cyber.github.io/Video-Essay-Simulator/"},
+    "Audio Fix Studio": {"status": "up", "code": 200, "url": "https://martinfu1997.github.io/audio-fix-studio/"},
+    "Kanban": {"status": "up", "code": 200, "url": "https://martinfu1997.github.io/kanban/"}
   }
 }
