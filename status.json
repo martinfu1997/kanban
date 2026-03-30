@@ -1,10 +1,10 @@
 {
-  "lastChecked": "2026-03-30T02:01:00Z",
+  "lastChecked": "2026-03-30T03:01:00Z",
   "sites": {
-    "ExtendPad": {"url": "https://frankfu0714-cyber.github.io/extendpad-privacy/privacy-policy.html", "status": "up", "code": 307},
+    "ExtendPad": {"url": "https://frankfu0714-cyber.github.io/extendpad-privacy/privacy-policy.html", "status": "up", "code": 200},
     "OnePost": {"url": "https://onepost-lovat.vercel.app", "status": "up", "code": 200},
     "VideoEssay": {"url": "https://frankfu0714-cyber.github.io/Video-Essay-Simulator/", "status": "up", "code": 200},
     "AudioFixStudio": {"url": "https://martinfu1997.github.io/audio-fix-studio/", "status": "up", "code": 200},
-    "Kanban": {"url": "https://martinfu1997.github.io/kanban/", "status": "up", "code": 200}
+    "Kanban": {"url": "https://martinfu1997.github.io/kanban/", "status": "up", "code": 307}
   }
 }
