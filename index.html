@@ -1320,7 +1320,9 @@ document.addEventListener('DOMContentLoaded', function() {
         html += `<div class="daily-task-card" id="sp-${p.id}" style="border-color:${statusColor}44;${fade}">
           <div class="daily-task-time">${p.time}</div>
           <div class="daily-task-title">${p.label}</div>
-          ${p.image ? `<img src="https://martinfu1997.github.io/kanban/${p.image}" onerror="this.style.display='none'" style="width:100%;border-radius:8px;margin-bottom:10px;aspect-ratio:1/1;object-fit:cover;">` : ''}
+          ${p.image ? (isPast || p.status === 'done' || p.status === 'scheduled'
+            ? `<img src="https://martinfu1997.github.io/kanban/${p.image}" onerror="this.style.display='none'" style="width:56px;height:56px;border-radius:6px;margin-bottom:8px;object-fit:cover;float:right;margin-left:8px;">`
+            : `<img src="https://martinfu1997.github.io/kanban/${p.image}" onerror="this.style.display='none'" style="width:100%;border-radius:8px;margin-bottom:10px;aspect-ratio:1/1;object-fit:cover;">`) : ''}
           <div style="font-size:0.78rem;color:#8b949e;white-space:pre-line;margin-bottom:12px;">${esc(p.caption)}</div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
             <span style="font-size:0.7rem;font-weight:600;padding:3px 10px;border-radius:10px;background:${statusColor}22;color:${statusColor};">${statusLabel}</span>
