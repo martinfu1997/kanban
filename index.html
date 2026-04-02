@@ -1168,7 +1168,8 @@
         body: JSON.stringify({
           channelId: 'cmnfs2ljn000004l5jtf5f0mr',
           caption: p.caption,
-          imageUrl: `https://raw.githubusercontent.com/martinfu1997/kanban/main/${p.image}`
+          imageUrl: `https://raw.githubusercontent.com/martinfu1997/kanban/main/${p.image}`,
+          platforms: ['threads', 'instagram', 'facebook']
         })
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
