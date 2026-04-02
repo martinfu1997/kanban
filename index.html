@@ -709,7 +709,7 @@
 </div>
 
 <!-- Social Media Posts Section -->
-<div class="section-title">🦞 Social Media Posts <span>Tomorrow's drafts · Approve to schedule</span> <button onclick="resetSocialPosts()" style="margin-left:12px;padding:3px 10px;font-size:11px;background:#333;color:#aaa;border:1px solid #555;border-radius:6px;cursor:pointer;" title="Reset approval status">↺ Reset</button></div>
+<div class="section-title">🦞 Social Media Posts <span>History · Approve to schedule</span> <button onclick="resetSocialPosts()" style="margin-left:12px;padding:3px 10px;font-size:11px;background:#333;color:#aaa;border:1px solid #555;border-radius:6px;cursor:pointer;" title="Reset current/future posts only">↺ Reset</button></div>
 <div id="social-posts-board" class="daily-tasks-board" style="grid-template-columns: repeat(3,1fr);"></div>
 
 <!-- Video Prompts Section -->
@@ -1112,37 +1112,99 @@
     }
   ];
 
-  let socialPosts = JSON.parse(localStorage.getItem('kanban-social-posts') || 'null') || SOCIAL_POSTS_DEFAULT;
+  // Load history: merge SOCIAL_POSTS_DEFAULT into stored posts (add new ids, keep existing state)
+  // and purge posts older than 7 days.
+  let socialPosts = (() => {
+    let stored = JSON.parse(localStorage.getItem('kanban-social-posts') || '[]');
+    if (!Array.isArray(stored)) stored = [];
+    const storedIds = new Set(stored.map(p => p.id));
+    for (const post of SOCIAL_POSTS_DEFAULT) {
+      if (!storedIds.has(post.id)) stored.push({ ...post });
+    }
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - 7);
+    cutoff.setHours(0, 0, 0, 0);
+    stored = stored.filter(p => !p.scheduledAt || new Date(p.scheduledAt) >= cutoff);
+    return stored;
+  })();
+  // Persist merged/pruned state immediately
+  localStorage.setItem('kanban-social-posts', JSON.stringify(socialPosts));
 
   function saveSocialPosts() {
     localStorage.setItem('kanban-social-posts', JSON.stringify(socialPosts));
   }
 
   function resetSocialPosts() {
-    localStorage.removeItem('kanban-social-posts');
-    socialPosts = JSON.parse(JSON.stringify(SOCIAL_POSTS_DEFAULT));
+    // Only reset pending status for today/future posts; leave past posts untouched
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const defaultMap = new Map(SOCIAL_POSTS_DEFAULT.map(p => [p.id, p]));
+    socialPosts = socialPosts.map(p => {
+      const postDay = p.scheduledAt ? new Date(p.scheduledAt) : null;
+      const isFuture = postDay && postDay >= today;
+      if (isFuture && defaultMap.has(p.id)) return { ...defaultMap.get(p.id) };
+      return p;
+    });
+    saveSocialPosts();
     renderSocialPosts();
-    showToast('Posts reset ✅', false);
+    showToast('Current posts reset ✅', false);
+  }
+
+  function smDateLabel(scheduledAt) {
+    if (!scheduledAt) return { dateStr: 'Unknown', suffix: '·', isPast: false };
+    const postDate = new Date(scheduledAt);
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate() + 1);
+    const postDay = new Date(postDate); postDay.setHours(0, 0, 0, 0);
+    const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const dateStr = months[postDate.getMonth()] + ' ' + postDate.getDate();
+    let suffix, isPast = false;
+    if (postDay < today)                             { suffix = '· Past';     isPast = true; }
+    else if (postDay.getTime() === today.getTime())  { suffix = '· Today';    }
+    else if (postDay.getTime() === tomorrow.getTime()){ suffix = '· Tomorrow'; }
+    else                                             { suffix = '· Upcoming'; }
+    return { dateStr, suffix, isPast };
   }
 
   function renderSocialPosts() {
     const board = document.getElementById('social-posts-board');
     if (!board) return;
-    board.innerHTML = socialPosts.map(p => {
-      const statusColor = p.status === 'approved' ? '#3fb950' : p.status === 'scheduled' ? '#388bfd' : '#f0c040';
-      const statusLabel = p.status === 'approved' ? '✅ Approved' : p.status === 'scheduled' ? '📅 Scheduled' : '⏳ Pending';
-      return `<div class="daily-task-card" id="sp-${p.id}" style="border-color: ${statusColor}44;">
-        <div class="daily-task-time">${p.time}</div>
-        <div class="daily-task-title">${p.label}</div>
-        ${p.image ? `<img src="https://martinfu1997.github.io/kanban/${p.image}" onerror="this.style.display='none'" style="width:100%;border-radius:8px;margin-bottom:10px;aspect-ratio:1/1;object-fit:cover;">` : ''}
-        <div style="font-size:0.78rem;color:#8b949e;white-space:pre-line;margin-bottom:12px;">${esc(p.caption)}</div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <span style="font-size:0.7rem;font-weight:600;padding:3px 10px;border-radius:10px;background:${statusColor}22;color:${statusColor};">${statusLabel}</span>
-          ${p.status === 'pending' ? `<button onclick="approveSocialPost('${p.id}')" style="font-size:0.7rem;padding:3px 10px;border-radius:10px;background:#1f3b2e;color:#3fb950;border:none;cursor:pointer;">✅ Approve</button>` : ''}
-          <button onclick="deleteSocialPost('${p.id}')" style="font-size:0.7rem;padding:3px 10px;border-radius:10px;background:#3d1f22;color:#f85149;border:none;cursor:pointer;">✕</button>
-        </div>
+
+    // Group by calendar day (derived from scheduledAt)
+    const groups = new Map();
+    for (const p of socialPosts) {
+      const dayKey = p.scheduledAt ? p.scheduledAt.slice(0, 10) : 'unknown';
+      if (!groups.has(dayKey)) groups.set(dayKey, []);
+      groups.get(dayKey).push(p);
+    }
+    const sortedKeys = [...groups.keys()].sort();
+
+    let html = '';
+    for (const dayKey of sortedKeys) {
+      const posts = groups.get(dayKey);
+      const { dateStr, suffix, isPast } = smDateLabel(posts[0].scheduledAt);
+      const headerColor = isPast ? '#484f58' : '#8b949e';
+      const suffixColor = isPast ? '#484f58' : '#58a6ff';
+      html += `<div style="grid-column:1/-1;margin-top:16px;margin-bottom:2px;padding-bottom:6px;border-bottom:1px solid #21262d;">
+        <span style="font-size:0.75rem;font-weight:600;color:${headerColor};text-transform:uppercase;letter-spacing:0.06em;">${dateStr} <span style="color:${suffixColor};font-weight:400;">${suffix}</span></span>
       </div>`;
-    }).join('');
+      for (const p of posts) {
+        const statusColor = p.status === 'approved' ? '#3fb950' : p.status === 'scheduled' ? '#388bfd' : '#f0c040';
+        const statusLabel = p.status === 'approved' ? '✅ Approved' : p.status === 'scheduled' ? '📅 Scheduled' : '⏳ Pending';
+        const fade = isPast ? 'opacity:0.55;' : '';
+        html += `<div class="daily-task-card" id="sp-${p.id}" style="border-color:${statusColor}44;${fade}">
+          <div class="daily-task-time">${p.time}</div>
+          <div class="daily-task-title">${p.label}</div>
+          ${p.image ? `<img src="https://martinfu1997.github.io/kanban/${p.image}" onerror="this.style.display='none'" style="width:100%;border-radius:8px;margin-bottom:10px;aspect-ratio:1/1;object-fit:cover;">` : ''}
+          <div style="font-size:0.78rem;color:#8b949e;white-space:pre-line;margin-bottom:12px;">${esc(p.caption)}</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <span style="font-size:0.7rem;font-weight:600;padding:3px 10px;border-radius:10px;background:${statusColor}22;color:${statusColor};">${statusLabel}</span>
+            ${p.status === 'pending' && !isPast ? `<button onclick="approveSocialPost('${p.id}')" style="font-size:0.7rem;padding:3px 10px;border-radius:10px;background:#1f3b2e;color:#3fb950;border:none;cursor:pointer;">✅ Approve</button>` : ''}
+            <button onclick="deleteSocialPost('${p.id}')" style="font-size:0.7rem;padding:3px 10px;border-radius:10px;background:#3d1f22;color:#f85149;border:none;cursor:pointer;">✕</button>
+          </div>
+        </div>`;
+      }
+    }
+    board.innerHTML = html;
   }
 
   function showToast(msg, isError) {
