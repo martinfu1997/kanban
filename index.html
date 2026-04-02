@@ -954,7 +954,7 @@
 
   // Password lock
   const PASS = 'fu' + '3432672';
-  function unlock() {
+  window.unlock = function() {
     const val = document.getElementById('pw-input').value;
     if (val === PASS) {
       localStorage.setItem('kanban-auth', PASS);
@@ -964,7 +964,8 @@
       document.getElementById('pw-input').value = '';
       document.getElementById('pw-input').focus();
     }
-  }
+  };
+  window.resetSocialPosts = resetSocialPosts;
   if (localStorage.getItem('kanban-auth') === PASS) {
     document.getElementById('lock-screen').classList.add('hidden');
   } else {
