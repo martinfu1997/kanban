@@ -598,6 +598,27 @@
 </style>
 </head>
 <body>
+<script>
+function unlock() {
+  var PASS = 'fu3432672';
+  var val = document.getElementById('pw-input').value;
+  if (val === PASS) {
+    localStorage.setItem('kanban-auth', PASS);
+    document.getElementById('lock-screen').classList.add('hidden');
+  } else {
+    document.getElementById('pw-error').style.display = 'block';
+    document.getElementById('pw-input').value = '';
+    document.getElementById('pw-input').focus();
+  }
+}
+document.addEventListener('DOMContentLoaded', function() {
+  if (localStorage.getItem('kanban-auth') === 'fu3432672') {
+    document.getElementById('lock-screen').classList.add('hidden');
+  } else {
+    setTimeout(function(){ document.getElementById('pw-input').focus(); }, 100);
+  }
+});
+</script>
 
 <div id="lock-screen">
   <div class="lock-box">
