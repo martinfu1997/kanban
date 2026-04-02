@@ -851,14 +851,21 @@ document.addEventListener('DOMContentLoaded', function() {
     { id: 122, title: "密碼管理 iOS App", desc: "把 iPhone 備忘錄裡的密碼整理成結構化 App。支援搜尋、複製貼上，讓找密碼變超簡單。", icon: "🔑", col: "todo", project: "general", updatedAt: "2026-04-02" },
   ];
 
-  // Merge stored cards with INITIAL_DATA — always sync cards from INITIAL_DATA by id
+  // Data version — bump this to force a full restore from INITIAL_DATA
+  const DATA_VERSION = 2;
+  const storedVersion = parseInt(localStorage.getItem('kanban-data-version') || '0');
   let stored = JSON.parse(localStorage.getItem('kanban-cards') || 'null');
   let cards;
-  if (!stored || stored.length === 0) {
-    cards = JSON.parse(JSON.stringify(INITIAL_DATA));
+  if (!stored || stored.length === 0 || storedVersion < DATA_VERSION) {
+    // Full restore: use INITIAL_DATA as the base, but preserve any user-created
+    // cards (ids not in INITIAL_DATA) from the stored data if available
+    const initialIds = new Set(INITIAL_DATA.map(c => c.id));
+    const userCards = (stored || []).filter(c => !initialIds.has(c.id));
+    cards = [...JSON.parse(JSON.stringify(INITIAL_DATA)), ...userCards];
     localStorage.setItem('kanban-cards', JSON.stringify(cards));
+    localStorage.setItem('kanban-data-version', String(DATA_VERSION));
   } else {
-    // Add any new cards from INITIAL_DATA that don't exist in stored
+    // Normal merge: add any new cards from INITIAL_DATA that don't exist in stored
     const storedIds = new Set(stored.map(c => c.id));
     const newCards = INITIAL_DATA.filter(c => !storedIds.has(c.id));
     cards = [...stored, ...newCards];
