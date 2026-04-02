@@ -709,7 +709,7 @@
 </div>
 
 <!-- Social Media Posts Section -->
-<div class="section-title">🦞 Social Media Posts <span>Tomorrow's drafts · Approve to schedule</span></div>
+<div class="section-title">🦞 Social Media Posts <span>Tomorrow's drafts · Approve to schedule</span> <button onclick="resetSocialPosts()" style="margin-left:12px;padding:3px 10px;font-size:11px;background:#333;color:#aaa;border:1px solid #555;border-radius:6px;cursor:pointer;" title="Reset approval status">↺ Reset</button></div>
 <div id="social-posts-board" class="daily-tasks-board" style="grid-template-columns: repeat(3,1fr);"></div>
 
 <!-- Video Prompts Section -->
@@ -1113,6 +1113,13 @@
 
   function saveSocialPosts() {
     localStorage.setItem('kanban-social-posts', JSON.stringify(socialPosts));
+  }
+
+  function resetSocialPosts() {
+    localStorage.removeItem('kanban-social-posts');
+    socialPosts = JSON.parse(JSON.stringify(SOCIAL_POSTS_DEFAULT));
+    renderSocialPosts();
+    showToast('Posts reset ✅', false);
   }
 
   function renderSocialPosts() {
