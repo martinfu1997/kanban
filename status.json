@@ -1,10 +1,1 @@
-{
-  "updated": "2026-04-02T12:01:00Z",
-  "sites": [
-    { "name": "ExtendPad", "url": "https://frankfu0714-cyber.github.io/extendpad-privacy/privacy-policy.html", "code": 200, "status": "UP" },
-    { "name": "One Post", "url": "https://onepost-lovat.vercel.app", "code": 307, "status": "UP" },
-    { "name": "Video Essay", "url": "https://frankfu0714-cyber.github.io/Video-Essay-Simulator/", "code": 200, "status": "UP" },
-    { "name": "Audio Fix Studio", "url": "https://martinfu1997.github.io/audio-fix-studio/", "code": 200, "status": "UP" },
-    { "name": "Kanban", "url": "https://martinfu1997.github.io/kanban/", "code": 200, "status": "UP" }
-  ]
-}
+{"updated": "2026-04-02T12:01:00Z", "sites": [{"name": "ExtendPad", "url": "https://frankfu0714-cyber.github.io/extendpad-privacy/privacy-policy.html", "code": 200, "status": "UP"}, {"name": "One Post", "url": "https://onepost-lovat.vercel.app", "code": 307, "status": "UP"}, {"name": "Video Essay", "url": "https://frankfu0714-cyber.github.io/Video-Essay-Simulator/", "code": 200, "status": "UP"}, {"name": "Audio Fix Studio", "url": "https://martinfu1997.github.io/audio-fix-studio/", "code": 200, "status": "UP"}, {"name": "Kanban", "url": "https://martinfu1997.github.io/kanban/", "code": 200, "status": "UP"}], "reportTimes": {"morning": "2026-04-02 09:00", "evening": "2026-04-02 21:00"}}
