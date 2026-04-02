@@ -1239,10 +1239,19 @@ document.addEventListener('DOMContentLoaded', function() {
   let socialPosts = (() => {
     let stored = JSON.parse(localStorage.getItem('kanban-social-posts') || '[]');
     if (!Array.isArray(stored)) stored = [];
+    const allDefaults = [...SOCIAL_POSTS_HISTORY, ...SOCIAL_POSTS_DEFAULT];
+    const defaultMap = new Map(allDefaults.map(p => [p.id, p]));
     const storedIds = new Set(stored.map(p => p.id));
-    for (const post of [...SOCIAL_POSTS_HISTORY, ...SOCIAL_POSTS_DEFAULT]) {
+    // Add missing posts
+    for (const post of allDefaults) {
       if (!storedIds.has(post.id)) stored.push({ ...post });
     }
+    // Update image field if stored has null but default has a value
+    stored = stored.map(p => {
+      const def = defaultMap.get(p.id);
+      if (def && !p.image && def.image) return { ...p, image: def.image };
+      return p;
+    });
     const cutoff = new Date();
     cutoff.setDate(cutoff.getDate() - 7);
     cutoff.setHours(0, 0, 0, 0);
