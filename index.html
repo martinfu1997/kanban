@@ -1168,26 +1168,7 @@
     p.status = 'approved';
     saveSocialPosts();
     renderSocialPosts();
-    try {
-      const res = await fetch('https://onepost-lovat.vercel.app/api/martin/post', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-API-Key': 'martin-lobster-2026'
-        },
-        body: JSON.stringify({
-          channelId: 'cmnfs2ljn000004l5jtf5f0mr',
-          caption: p.caption,
-          imageUrl: `https://raw.githubusercontent.com/martinfu1997/kanban/main/${p.image}`,
-          platforms: ['threads', 'instagram', 'facebook'],
-          ...(p.scheduledAt ? { scheduledAt: p.scheduledAt } : {})
-        })
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      showToast('Post scheduled to OnePost ✅', false);
-    } catch (e) {
-      showToast(`OnePost error: ${e.message}`, true);
-    }
+    showToast('Approved ✅ Martin will schedule at 9 PM tonight', false);
   }
 
   function deleteSocialPost(id) {
