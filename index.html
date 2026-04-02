@@ -854,8 +854,9 @@ document.addEventListener('DOMContentLoaded', function() {
   // Merge stored cards with INITIAL_DATA — always sync cards from INITIAL_DATA by id
   let stored = JSON.parse(localStorage.getItem('kanban-cards') || 'null');
   let cards;
-  if (!stored) {
-    cards = INITIAL_DATA;
+  if (!stored || stored.length === 0) {
+    cards = JSON.parse(JSON.stringify(INITIAL_DATA));
+    localStorage.setItem('kanban-cards', JSON.stringify(cards));
   } else {
     // Add any new cards from INITIAL_DATA that don't exist in stored
     const storedIds = new Set(stored.map(c => c.id));
