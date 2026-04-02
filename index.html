@@ -1078,19 +1078,37 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // ── Site Status ──────────────────────────────────────────────
   function renderSiteStatus(data) {
+    // Support both {sites:[]} array format and {extended:{ok,time}} map format
+    const nameToId = {
+      'ExtendPad': 'extended', 'One Post': 'onepost', 'Video Essay': 'videoessay',
+      'Kanban': 'kanban', 'Audio Fix Studio': 'audiofixstudio'
+    };
+    let map = {};
+    if (data.sites && Array.isArray(data.sites)) {
+      data.sites.forEach(s => {
+        const id = nameToId[s.name] || s.name.toLowerCase().replace(/\s+/g,'');
+        const ok = s.state === 'up' || s.httpCode === 200;
+        const time = s.checkedAt ? new Date(s.checkedAt).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : '';
+        map[id] = { ok, time };
+      });
+    } else {
+      map = data;
+    }
     const sites = ['extended','onepost','videoessay','kanban','audiofixstudio'];
     sites.forEach(id => {
       const card = document.getElementById('site-' + id);
       if (!card) return;
       const badge = card.querySelector('.site-badge');
-      const info = data[id];
+      const info = map[id];
       if (info) {
         badge.className = 'site-badge ' + (info.ok ? 'ok' : 'down');
-        badge.textContent = (info.ok ? '⬤ Online' : '⬤ Down') + ' — ' + info.time;
+        badge.textContent = (info.ok ? '⬤ Online' : '⬤ Down') + (info.time ? ' — ' + info.time : '');
       }
     });
-    if (data._lastChecked) {
-      document.getElementById('status-last-checked').textContent = 'Last checked: ' + data._lastChecked;
+    const lastChecked = data.lastUpdated || data._lastChecked;
+    if (lastChecked) {
+      const el = document.getElementById('status-last-checked');
+      if (el) el.textContent = 'Last checked: ' + new Date(lastChecked).toLocaleString();
     }
   }
 
@@ -1100,10 +1118,21 @@ document.addEventListener('DOMContentLoaded', function() {
     .then(data => renderSiteStatus(data))
     .catch(() => renderSiteStatus(JSON.parse(localStorage.getItem('kanban-site-status') || '{}')));
 
-  // ── Report timestamps ──────────────────────────────────────────
-  const reportTimes = JSON.parse(localStorage.getItem('kanban-report-times') || '{}');
-  if (reportTimes.morning) document.getElementById('last-morning').textContent = '🕐 Last sent: ' + reportTimes.morning;
-  if (reportTimes.evening) document.getElementById('last-evening').textContent = '🕐 Last sent: ' + reportTimes.evening;
+  // ── Report timestamps — load from status.json ─────────────────
+  fetch('status.json?v=' + Date.now())
+    .then(r => r.json())
+    .then(data => {
+      const rt = data.reportTimes || {};
+      const lsRT = JSON.parse(localStorage.getItem('kanban-report-times') || '{}');
+      const morning = rt.morning || lsRT.morning;
+      const evening = rt.evening || lsRT.evening;
+      if (morning) document.getElementById('last-morning').textContent = '🕐 Last sent: ' + morning;
+      if (evening) document.getElementById('last-evening').textContent = '🕐 Last sent: ' + evening;
+    }).catch(() => {
+      const reportTimes = JSON.parse(localStorage.getItem('kanban-report-times') || '{}');
+      if (reportTimes.morning) document.getElementById('last-morning').textContent = '🕐 Last sent: ' + reportTimes.morning;
+      if (reportTimes.evening) document.getElementById('last-evening').textContent = '🕐 Last sent: ' + reportTimes.evening;
+    });
 
   // ── Prompt section timestamp ────────────────────────────────────
   const promptMeta = JSON.parse(localStorage.getItem('kanban-prompt-meta') || '{}');
