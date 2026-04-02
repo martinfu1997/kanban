@@ -1237,6 +1237,11 @@ document.addEventListener('DOMContentLoaded', function() {
   // Load history: merge SOCIAL_POSTS_DEFAULT into stored posts (add new ids, keep existing state)
   // and purge posts older than 7 days.
   let socialPosts = (() => {
+    const SOCIAL_VERSION = 3; // bump this to force full reload
+    if (parseInt(localStorage.getItem('kanban-social-v') || '0') < SOCIAL_VERSION) {
+      localStorage.removeItem('kanban-social-posts');
+      localStorage.setItem('kanban-social-v', String(SOCIAL_VERSION));
+    }
     let stored = JSON.parse(localStorage.getItem('kanban-social-posts') || '[]');
     if (!Array.isArray(stored)) stored = [];
     const allDefaults = [...SOCIAL_POSTS_HISTORY, ...SOCIAL_POSTS_DEFAULT];
