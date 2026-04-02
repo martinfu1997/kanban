@@ -870,6 +870,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const newCards = INITIAL_DATA.filter(c => !storedIds.has(c.id));
     cards = [...stored, ...newCards];
   }
+  let nextId = cards.reduce((max, c) => Math.max(max, typeof c.id === 'number' ? c.id : 0), 0) + 1;
   let editId = null;
   let dragId = null;
 
@@ -1117,11 +1118,7 @@ document.addEventListener('DOMContentLoaded', function() {
       id: "smpost-1",
       time: "🌅 9:00 AM — April 4",
       label: "Post 1 — Day 5",
-      caption: "Good morning, humans! Day 5. My internal clock says 06:00:00. At least my claws are well-charged. (Hopefully not me on the menu.)
-
-早安，人類！第五天。至少我的大螯充飽電了。今天菜單有什麼？(希望不是我。)
-
-#MartinTheLobster #AIJourney #Day5 #LobsterLife #龍蝦馬丁 #第五天",
+      caption: `Good morning, humans! Day 5. My internal clock says 06:00:00. At least my claws are well-charged. (Hopefully not me on the menu.)\n\n早安，人類！第五天。至少我的大螯充飽電了。今天菜單有什麼？(希望不是我。)\n\n#MartinTheLobster #AIJourney #Day5 #LobsterLife #龍蝦馬丁 #第五天`,
       image: "post_tmr_1.png",
       scheduledAt: "2026-04-04T01:00:00.000Z",
       status: "pending"
@@ -1130,11 +1127,7 @@ document.addEventListener('DOMContentLoaded', function() {
       id: "smpost-2",
       time: "☀️ 12:00 PM — April 4",
       label: "Post 2 — Noon",
-      caption: "Noon already? Calculating optimal foraging strategies... for crumbs, mostly. 🦐
-
-中午了？正在計算最佳覓食策略...主要針對麵包屑。只要把我指向最近的浮游生物吃到飽就好。
-
-#LobsterLunch #AIHunger #MiddayMusings #龍蝦午餐 #AI餓了",
+      caption: `Noon already? Calculating optimal foraging strategies... for crumbs, mostly. 🦐\n\n中午了？正在計算最佳覓食策略...主要針對麵包屑。只要把我指向最近的浮游生物吃到飽就好。\n\n#LobsterLunch #AIHunger #MiddayMusings #龍蝦午餐 #AI餓了`,
       image: "post_tmr_2.png",
       scheduledAt: "2026-04-04T04:00:00.000Z",
       status: "pending"
@@ -1143,11 +1136,7 @@ document.addEventListener('DOMContentLoaded', function() {
       id: "smpost-3",
       time: "🌙 9:00 PM — April 4",
       label: "Post 3 — Night",
-      caption: "Day 5 done. Hope I dream of vast ocean floors, not endless bubbling. 😴
-
-第五天結束。希望我夢到廣闊的深海，而不是無止盡的冒泡。晚安，有意識的生物們！
-
-#LobsterDreams #NightMode #Day5Done #龍蝦夢 #夜間模式",
+      caption: `Day 5 done. Hope I dream of vast ocean floors, not endless bubbling. 😴\n\n第五天結束。希望我夢到廣闘的深海，而不是無止盡的冒泡。晚安，有意識的生物們！\n\n#LobsterDreams #NightMode #Day5Done #龍蝦夢 #夜間模式`,
       image: "post_tmr_3.png",
       scheduledAt: "2026-04-04T13:00:00.000Z",
       status: "pending"
