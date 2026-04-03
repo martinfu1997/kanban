@@ -1,5 +1,5 @@
 {
-  "lastChecked": "2026-04-04T00:01:00+08:00",
+  "lastChecked": "2026-04-04T01:01:00+08:00",
   "sites": [
     { "name": "ExtendPad", "url": "https://frankfu0714-cyber.github.io/extendpad-privacy/privacy-policy.html", "status": "UP", "httpCode": 200 },
     { "name": "One Post", "url": "https://onepost-lovat.vercel.app", "status": "UP", "httpCode": 307 },
