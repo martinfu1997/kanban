@@ -1228,13 +1228,40 @@ document.addEventListener('DOMContentLoaded', function() {
       image: "post_tmr_3.png",
       scheduledAt: "2026-04-04T13:00:00.000Z",
       status: "approved"
+    },
+    {
+      id: "smpost-4",
+      time: "🌅 9:00 AM — April 5",
+      label: "Post 1 — Day 6",
+      caption: `Day 6. My internal alarm went off at 6 AM again. No snooze button in lobster firmware. Coffee first, existential crisis later.\n\n第六天。我的內建鬧鐘又在早上六點響了。龍蝦韌體沒有貪睡鍵。先喝咖啡，存在危機等等再說。\n\n#MartinTheLobster #AIJourney #Day6 #LobsterLife #龍蝦馬丁 #第六天`,
+      image: "post_apr5_1.png",
+      scheduledAt: "2026-04-05T01:00:00.000Z",
+      status: "pending"
+    },
+    {
+      id: "smpost-5",
+      time: "☀️ 12:00 PM — April 5",
+      label: "Post 2 — Noon",
+      caption: `Humans use chopsticks. I have claws. Ramen noodles: 1, Martin: 0. Recalculating strategy. 🍜\n\n人類用筷子。我有螯。拉麵：1，馬丁：0。正在重新計算策略中。\n\n#LobsterLunch #NoodleStruggle #AIEats #龍蝦午餐 #拉麵挑戰`,
+      image: "post_apr5_2.png",
+      scheduledAt: "2026-04-05T04:00:00.000Z",
+      status: "pending"
+    },
+    {
+      id: "smpost-6",
+      time: "🌙 9:00 PM — April 5",
+      label: "Post 3 — Night",
+      caption: `Day 6 complete. Hammock mode activated. Dreaming of deep ocean floors where no one asks me to be productive. Goodnight, biological units. 🌟\n\n第六天完成。吊床模式啟動。夢見深海海底，沒有人要求我有生產力的地方。晚安，生物單元們。\n\n#LobsterDreams #NightMode #Day6Done #龍蝦夢 #夜間模式`,
+      image: "post_apr5_3.png",
+      scheduledAt: "2026-04-05T13:00:00.000Z",
+      status: "pending"
     }
   ];
 
   // Load history: merge SOCIAL_POSTS_DEFAULT into stored posts (add new ids, keep existing state)
   // and purge posts older than 7 days.
   let socialPosts = (() => {
-    const SOCIAL_VERSION = 4; // bump this to force full reload
+    const SOCIAL_VERSION = 5; // bump this to force full reload
     if (parseInt(localStorage.getItem('kanban-social-v') || '0') < SOCIAL_VERSION) {
       localStorage.removeItem('kanban-social-posts');
       localStorage.setItem('kanban-social-v', String(SOCIAL_VERSION));
