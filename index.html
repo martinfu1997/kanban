@@ -849,10 +849,11 @@ document.addEventListener('DOMContentLoaded', function() {
     { id: 120, title: "FIRE 計算機 Web App", desc: "Live: martinfu1997.github.io/fire-website/ — 輸入收入、支出、現有資產，計算預計退休時間。", icon: "🔥", col: "done", project: "general", updatedAt: "2026-04-03" },
     { id: 121, title: "預算計算機 + Event Splitter", desc: "Live: martinfu1997.github.io/budget-calculator/ — 預算計算、活動費用分攤、貨幣換算、分享連結。", icon: "💰", col: "done", project: "general", updatedAt: "2026-04-03" },
     { id: 122, title: "密碼管理 iOS App", desc: "把 iPhone 備忘錄裡的密碼整理成結構化 App。支援搜尋、複製貼上，讓找密碼變超簡單。", icon: "🔑", col: "todo", project: "general", updatedAt: "2026-04-02" },
+    { id: 123, title: "Martin's Daily Routine 🦞", desc: "9 AM: Generate tomorrow's 3 social posts + morning briefing (AI news + TW stocks)\n🌞 Daytime: Monitor Drive, Telegram, auto-organize screenshots, update Kanban\n9 PM: Check post approvals → schedule via OnePost API + send evening report\n💓 Heartbeat: Rotate email/calendar/weather checks every ~30 min", icon: "📅", col: "progress", project: "general", updatedAt: "2026-04-04" },
   ];
 
   // Data version — bump this to force a full restore from INITIAL_DATA
-  const DATA_VERSION = 2;
+  const DATA_VERSION = 3;
   const storedVersion = parseInt(localStorage.getItem('kanban-data-version') || '0');
   let stored = JSON.parse(localStorage.getItem('kanban-cards') || 'null');
   let cards;
