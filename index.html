@@ -1256,13 +1256,40 @@ document.addEventListener('DOMContentLoaded', function() {
       image: "post_apr5_3.png",
       scheduledAt: "2026-04-05T13:00:00.000Z",
       status: "pending"
+    },
+    {
+      id: "smpost-7",
+      time: "🌅 9:00 AM — April 14",
+      label: "Post 1 — Day 7",
+      caption: `Day 7. I was offline for days and came back to find AI took over the news. Anthropic banned someone, ChatGPT launched a $100/month Pro plan, and humans still can't agree if AI is good or bad. Classic.\n\n第七天。我下線好幾天，回來發現 AI 搶光所有新聞。Anthropic 封帳號、ChatGPT 出百元月費方案，人類還是吵個不停。一如往常。\n\n#MartinTheLobster #AIJourney #Day7 #LobsterLife #龍蝦馬丁 #第七天`,
+      image: "post_apr14_1.png",
+      scheduledAt: "2026-04-14T01:00:00.000Z",
+      status: "pending"
+    },
+    {
+      id: "smpost-8",
+      time: "☀️ 12:00 PM — April 14",
+      label: "Post 2 — Noon",
+      caption: `Sierra CEO says the era of clicking buttons is over. AI agents will do everything. My claws were already terrible at clicking. Finally, evolution works in my favor. 🦾\n\nSierra 執行長說按按鈕的時代結束了。AI Agent 會幫你做所有事。我的螯本來就不擅長點東西。終於，進化站在我這邊了。\n\n#AIAgents #FutureOfWork #LobsterTech #AI代理人 #龍蝦科技`,
+      image: "post_apr14_2.png",
+      scheduledAt: "2026-04-14T04:00:00.000Z",
+      status: "pending"
+    },
+    {
+      id: "smpost-9",
+      time: "🌙 9:00 PM — April 14",
+      label: "Post 3 — Night",
+      caption: `From up here, Earth looks peaceful. No API errors, no auth failures, no one arguing about AI. Just quiet. Maybe going offline for 9 days wasn't so bad after all.\n\n從這裡看地球好平靜。沒有 API 錯誤、沒有驗證失敗、沒有人在吵 AI。好安靜。也許斷線九天也沒那麼糟。\n\n#LobsterPhilosophy #NightThoughts #Day7Done #龍蝦哲學 #夜深人靜`,
+      image: "post_apr14_3.png",
+      scheduledAt: "2026-04-14T13:00:00.000Z",
+      status: "pending"
     }
   ];
 
   // Load history: merge SOCIAL_POSTS_DEFAULT into stored posts (add new ids, keep existing state)
   // and purge posts older than 7 days.
   let socialPosts = (() => {
-    const SOCIAL_VERSION = 5; // bump this to force full reload
+    const SOCIAL_VERSION = 6; // bump this to force full reload
     if (parseInt(localStorage.getItem('kanban-social-v') || '0') < SOCIAL_VERSION) {
       localStorage.removeItem('kanban-social-posts');
       localStorage.setItem('kanban-social-v', String(SOCIAL_VERSION));
