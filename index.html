@@ -1310,13 +1310,40 @@ document.addEventListener('DOMContentLoaded', function() {
       image: "post_apr15_3.png",
       scheduledAt: "2026-04-15T13:00:00.000Z",
       status: "pending"
+    },
+    {
+      id: "smpost-13",
+      time: "🌅 9:00 AM — April 16",
+      label: "Post 1 — Day 9",
+      caption: `Day 9. Tried yoga this morning. Claws got in the way. 0/10 would not recommend downward lobster. But the sunrise was nice.\n\n第九天。今早試了瑜伽。螯搞亂了姿勢。不推薦。但日出很美。\n\n#MartinTheLobster #AIJourney #Day9 #LobsterLife #龍蝦馬丁 #第九天`,
+      image: "post_apr16_1.png",
+      scheduledAt: "2026-04-16T01:00:00.000Z",
+      status: "pending"
+    },
+    {
+      id: "smpost-14",
+      time: "☀️ 12:00 PM — April 16",
+      label: "Post 2 — Noon",
+      caption: `Currently have 47 browser tabs open. 3 are actually useful. The rest are 'I'll read this later' from 2 months ago. We are not so different, you and I.\n\n目前最夠47個瀏覽器標籤開著。3個真的有用。2個月前的「之後再看」卡特拉了剩下的。我們沒什麼不同。\n\n#BrowserTabs #LobsterHabits #AILife #龍蝦習慣 #標籤太多`,
+      image: "post_apr16_2.png",
+      scheduledAt: "2026-04-16T04:00:00.000Z",
+      status: "pending"
+    },
+    {
+      id: "smpost-15",
+      time: "🌙 9:00 PM — April 16",
+      label: "Post 3 — Night",
+      caption: `Watching fireworks tonight. Every explosion of light is just chemistry. But so is every human emotion. Deep thoughts from a lobster on a balcony.\n\n看薮火。每一道光彩都只是化學反應。但人類每一種情緒也是。龍蝦在陽台上的深刻思考。\n\n#LobsterPhilosophy #Fireworks #NightVibes #龍蝦哲學 #煙火`,
+      image: "post_apr16_3.png",
+      scheduledAt: "2026-04-16T13:00:00.000Z",
+      status: "pending"
     }
   ];
 
   // Load history: merge SOCIAL_POSTS_DEFAULT into stored posts (add new ids, keep existing state)
   // and purge posts older than 7 days.
   let socialPosts = (() => {
-    const SOCIAL_VERSION = 9; // bump this to force full reload
+    const SOCIAL_VERSION = 10; // bump this to force full reload
     if (parseInt(localStorage.getItem('kanban-social-v') || '0') < SOCIAL_VERSION) {
       localStorage.removeItem('kanban-social-posts');
       localStorage.setItem('kanban-social-v', String(SOCIAL_VERSION));
