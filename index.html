@@ -704,6 +704,97 @@
   .checklist-item:hover .checklist-delete { opacity: 1; }
   .checklist-delete:hover { color: #f85149; }
 
+  /* Expandable item wrapper */
+  .checklist-item-wrapper { display: flex; flex-direction: column; }
+
+  .checklist-chevron {
+    width: 14px; height: 14px;
+    display: flex; align-items: center; justify-content: center;
+    color: #6e7681;
+    font-size: 0.55rem;
+    transition: transform 0.15s, color 0.15s;
+    flex-shrink: 0;
+    user-select: none;
+  }
+  .checklist-item-wrapper.expanded .checklist-chevron {
+    transform: rotate(90deg);
+    color: #58a6ff;
+  }
+  .checklist-item:hover .checklist-chevron { color: #c9d1d9; }
+
+  /* Sub-checklist */
+  .subchecklist {
+    display: none;
+    margin-left: 28px;
+    padding: 6px 0 6px 10px;
+    border-left: 1px solid #21262d;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .checklist-item-wrapper.expanded .subchecklist { display: flex; }
+
+  .subchecklist-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: background 0.12s;
+    border: 1px solid transparent;
+  }
+  .subchecklist-item:hover { background: #1c2129; border-color: #30363d; }
+
+  .subchecklist-checkbox {
+    width: 13px; height: 13px;
+    border: 1.5px solid #484f58;
+    border-radius: 3px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+  .subchecklist-item.done .subchecklist-checkbox {
+    background: #58a6ff;
+    border-color: #58a6ff;
+  }
+  .subchecklist-item.done .subchecklist-checkbox::after {
+    content: '✓'; color: #fff; font-size: 9px; line-height: 1;
+  }
+
+  .subchecklist-label {
+    flex: 1;
+    color: #c9d1d9;
+    word-break: break-word;
+  }
+  .subchecklist-item.done .subchecklist-label {
+    color: #6e7681; text-decoration: line-through;
+  }
+
+  .subchecklist-delete {
+    background: transparent; border: none;
+    color: #484f58; font-size: 0.8rem;
+    cursor: pointer; padding: 0 4px;
+    opacity: 0;
+    transition: opacity 0.15s, color 0.15s;
+  }
+  .subchecklist-item:hover .subchecklist-delete { opacity: 1; }
+  .subchecklist-delete:hover { color: #f85149; }
+
+  .subchecklist-add {
+    background: transparent;
+    border: 1px dashed #30363d;
+    color: #6e7681;
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: 0.72rem;
+    cursor: pointer;
+    margin-top: 2px;
+    transition: all 0.15s;
+    align-self: flex-start;
+  }
+  .subchecklist-add:hover { color: #58a6ff; border-color: #58a6ff; }
+
   @media (max-width: 768px) {
     .ideas-checklist-board { grid-template-columns: 1fr; }
   }
@@ -748,7 +839,7 @@ document.addEventListener('DOMContentLoaded', function() {
 </header>
 
 <!-- Ideas Checklist Section -->
-<div class="section-title" style="margin-top:0;">✅ Ideas Checklist <span>Click to mark complete · ＋ to add</span></div>
+<div class="section-title" style="margin-top:0;">✅ Ideas Checklist <span>Click ▶ to expand · ＋ Add idea inside each item</span></div>
 <div class="ideas-checklist-board">
   <div class="ideas-checklist-column">
     <div class="ideas-checklist-header">
@@ -1636,23 +1727,34 @@ document.addEventListener('DOMContentLoaded', function() {
   const SECTION_LABEL = { apps: 'Real App Ideas', existing: 'Existing', video: 'AI Video' };
   const DEFAULT_DATA = {
     apps: [
-      { id: 1, text: "n8n AI Video Workflow", done: false }
+      { id: 1, text: "n8n AI Video Workflow", ideas: [] }
     ],
     existing: [
-      { id: 2, text: "One Post", done: false },
-      { id: 3, text: "Budget Calculator", done: false },
-      { id: 4, text: "Fire Calculator", done: false },
-      { id: 5, text: "goldotakuTW.com", done: false }
+      { id: 2, text: "One Post", ideas: [] },
+      { id: 3, text: "Budget Calculator", ideas: [] },
+      { id: 4, text: "Fire Calculator", ideas: [] },
+      { id: 5, text: "goldotakuTW.com", ideas: [] }
     ],
     video: [
-      { id: 6, text: "Gold Otaku", done: false },
-      { id: 7, text: "Soft Miles", done: false },
-      { id: 8, text: "Underdog Justice", done: false },
-      { id: 9, text: "Crashlab", done: false }
+      { id: 6, text: "Gold Otaku", ideas: [] },
+      { id: 7, text: "Soft Miles", ideas: [] },
+      { id: 8, text: "Underdog Justice", ideas: [] },
+      { id: 9, text: "Crashlab", ideas: [] }
     ]
   };
 
   function clone(obj) { return JSON.parse(JSON.stringify(obj)); }
+
+  function migrateItem(item) {
+    // Backward-compat: drop old `done` property, ensure `ideas` array exists
+    return {
+      id: item.id,
+      text: item.text,
+      ideas: Array.isArray(item.ideas) ? item.ideas.map(s => ({
+        id: s.id, text: s.text, done: !!s.done
+      })) : []
+    };
+  }
 
   function loadChecklist() {
     try {
@@ -1660,9 +1762,9 @@ document.addEventListener('DOMContentLoaded', function() {
       if (!raw) return clone(DEFAULT_DATA);
       const parsed = JSON.parse(raw);
       return {
-        apps: Array.isArray(parsed.apps) ? parsed.apps : [],
-        existing: Array.isArray(parsed.existing) ? parsed.existing : [],
-        video: Array.isArray(parsed.video) ? parsed.video : []
+        apps: Array.isArray(parsed.apps) ? parsed.apps.map(migrateItem) : [],
+        existing: Array.isArray(parsed.existing) ? parsed.existing.map(migrateItem) : [],
+        video: Array.isArray(parsed.video) ? parsed.video.map(migrateItem) : []
       };
     } catch (e) {
       return clone(DEFAULT_DATA);
@@ -1674,9 +1776,13 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   let checklistData = loadChecklist();
+  const expanded = new Set();
   let nextId = 1;
   Object.values(checklistData).forEach(list => list.forEach(item => {
     if (typeof item.id === 'number' && item.id >= nextId) nextId = item.id + 1;
+    (item.ideas || []).forEach(s => {
+      if (typeof s.id === 'number' && s.id >= nextId) nextId = s.id + 1;
+    });
   }));
 
   function renderSection(key, containerId) {
@@ -1684,30 +1790,88 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!container) return;
     container.innerHTML = '';
     checklistData[key].forEach(item => {
+      const wrap = document.createElement('div');
+      wrap.className = 'checklist-item-wrapper' + (expanded.has(item.id) ? ' expanded' : '');
+
+      // Header row: chevron + label + count + delete
       const row = document.createElement('div');
-      row.className = 'checklist-item' + (item.done ? ' done' : '');
+      row.className = 'checklist-item';
+      const ideaCount = (item.ideas || []).length;
+      const doneCount = (item.ideas || []).filter(s => s.done).length;
+      const countLabel = ideaCount > 0 ? doneCount + '/' + ideaCount : '';
       row.innerHTML =
-        '<div class="checklist-checkbox"></div>' +
+        '<div class="checklist-chevron">▶</div>' +
         '<span class="checklist-label"></span>' +
+        '<span class="checklist-count" style="color:#6e7681;font-size:0.72rem;margin-right:4px;"></span>' +
         '<button class="checklist-delete" title="Delete">✕</button>';
       row.querySelector('.checklist-label').textContent = item.text;
+      row.querySelector('.checklist-count').textContent = countLabel;
 
       row.addEventListener('click', (e) => {
         if (e.target.closest('.checklist-delete')) return;
-        item.done = !item.done;
-        saveChecklist();
+        if (expanded.has(item.id)) expanded.delete(item.id);
+        else expanded.add(item.id);
         renderChecklist();
       });
 
       row.querySelector('.checklist-delete').addEventListener('click', (e) => {
         e.stopPropagation();
-        if (!confirm('Delete "' + item.text + '"?')) return;
+        if (!confirm('Delete "' + item.text + '" and all its ideas?')) return;
         checklistData[key] = checklistData[key].filter(i => i.id !== item.id);
+        expanded.delete(item.id);
         saveChecklist();
         renderChecklist();
       });
 
-      container.appendChild(row);
+      wrap.appendChild(row);
+
+      // Sub-checklist
+      const sub = document.createElement('div');
+      sub.className = 'subchecklist';
+      (item.ideas || []).forEach(s => {
+        const subRow = document.createElement('div');
+        subRow.className = 'subchecklist-item' + (s.done ? ' done' : '');
+        subRow.innerHTML =
+          '<div class="subchecklist-checkbox"></div>' +
+          '<span class="subchecklist-label"></span>' +
+          '<button class="subchecklist-delete" title="Delete">✕</button>';
+        subRow.querySelector('.subchecklist-label').textContent = s.text;
+
+        subRow.addEventListener('click', (e) => {
+          if (e.target.closest('.subchecklist-delete')) return;
+          s.done = !s.done;
+          saveChecklist();
+          renderChecklist();
+        });
+
+        subRow.querySelector('.subchecklist-delete').addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (!confirm('Delete "' + s.text + '"?')) return;
+          item.ideas = item.ideas.filter(x => x.id !== s.id);
+          saveChecklist();
+          renderChecklist();
+        });
+
+        sub.appendChild(subRow);
+      });
+
+      const addBtn = document.createElement('button');
+      addBtn.className = 'subchecklist-add';
+      addBtn.textContent = '＋ Add idea';
+      addBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const text = prompt('New idea for "' + item.text + '":');
+        if (!text || !text.trim()) return;
+        if (!item.ideas) item.ideas = [];
+        item.ideas.push({ id: nextId++, text: text.trim(), done: false });
+        expanded.add(item.id);
+        saveChecklist();
+        renderChecklist();
+      });
+      sub.appendChild(addBtn);
+      wrap.appendChild(sub);
+
+      container.appendChild(wrap);
     });
   }
 
@@ -1721,7 +1885,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const label = SECTION_LABEL[key] || key;
     const text = prompt('New item for ' + label + ':');
     if (!text || !text.trim()) return;
-    checklistData[key].push({ id: nextId++, text: text.trim(), done: false });
+    checklistData[key].push({ id: nextId++, text: text.trim(), ideas: [] });
     saveChecklist();
     renderChecklist();
   };
