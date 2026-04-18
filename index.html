@@ -1725,9 +1725,12 @@ document.addEventListener('DOMContentLoaded', function() {
 (function() {
   const STORAGE_KEY = 'kanban-ideas-checklist';
   const SECTION_LABEL = { apps: 'Real App Ideas', existing: 'Existing', video: 'AI Video' };
+  // Only Real App Ideas are themselves completable. Existing apps and AI Video channels
+  // are ongoing categories, not tasks — their top-level items just expand.
+  const SECTION_CHECKABLE = { apps: true, existing: false, video: false };
   const DEFAULT_DATA = {
     apps: [
-      { id: 1, text: "n8n AI Video Workflow", ideas: [] }
+      { id: 1, text: "n8n AI Video Workflow", done: false, ideas: [] }
     ],
     existing: [
       { id: 2, text: "One Post", ideas: [] },
@@ -1745,15 +1748,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function clone(obj) { return JSON.parse(JSON.stringify(obj)); }
 
-  function migrateItem(item) {
-    // Backward-compat: drop old `done` property, ensure `ideas` array exists
-    return {
+  function migrateItem(item, checkable) {
+    // Backward-compat: ensure ideas array; preserve `done` only for checkable sections
+    const out = {
       id: item.id,
       text: item.text,
       ideas: Array.isArray(item.ideas) ? item.ideas.map(s => ({
         id: s.id, text: s.text, done: !!s.done
       })) : []
     };
+    if (checkable) out.done = !!item.done;
+    return out;
   }
 
   function loadChecklist() {
@@ -1762,9 +1767,9 @@ document.addEventListener('DOMContentLoaded', function() {
       if (!raw) return clone(DEFAULT_DATA);
       const parsed = JSON.parse(raw);
       return {
-        apps: Array.isArray(parsed.apps) ? parsed.apps.map(migrateItem) : [],
-        existing: Array.isArray(parsed.existing) ? parsed.existing.map(migrateItem) : [],
-        video: Array.isArray(parsed.video) ? parsed.video.map(migrateItem) : []
+        apps: Array.isArray(parsed.apps) ? parsed.apps.map(i => migrateItem(i, SECTION_CHECKABLE.apps)) : [],
+        existing: Array.isArray(parsed.existing) ? parsed.existing.map(i => migrateItem(i, SECTION_CHECKABLE.existing)) : [],
+        video: Array.isArray(parsed.video) ? parsed.video.map(i => migrateItem(i, SECTION_CHECKABLE.video)) : []
       };
     } catch (e) {
       return clone(DEFAULT_DATA);
@@ -1789,28 +1794,57 @@ document.addEventListener('DOMContentLoaded', function() {
     const container = document.getElementById(containerId);
     if (!container) return;
     container.innerHTML = '';
+    const checkable = !!SECTION_CHECKABLE[key];
     checklistData[key].forEach(item => {
       const wrap = document.createElement('div');
       wrap.className = 'checklist-item-wrapper' + (expanded.has(item.id) ? ' expanded' : '');
 
-      // Header row: chevron + label + count + delete
+      // Header row: chevron + [checkbox if checkable] + label + count + delete
       const row = document.createElement('div');
-      row.className = 'checklist-item';
+      row.className = 'checklist-item' + (checkable && item.done ? ' done' : '');
       const ideaCount = (item.ideas || []).length;
       const doneCount = (item.ideas || []).filter(s => s.done).length;
       const countLabel = ideaCount > 0 ? doneCount + '/' + ideaCount : '';
+      const checkboxHtml = checkable ? '<div class="checklist-checkbox"></div>' : '';
       row.innerHTML =
         '<div class="checklist-chevron">▶</div>' +
+        checkboxHtml +
         '<span class="checklist-label"></span>' +
         '<span class="checklist-count" style="color:#6e7681;font-size:0.72rem;margin-right:4px;"></span>' +
         '<button class="checklist-delete" title="Delete">✕</button>';
       row.querySelector('.checklist-label').textContent = item.text;
       row.querySelector('.checklist-count').textContent = countLabel;
 
-      row.addEventListener('click', (e) => {
-        if (e.target.closest('.checklist-delete')) return;
+      // Clicking the chevron expands; clicking the checkbox (if present) toggles done;
+      // clicking the label does the section-appropriate action.
+      const chevEl = row.querySelector('.checklist-chevron');
+      chevEl.addEventListener('click', (e) => {
+        e.stopPropagation();
         if (expanded.has(item.id)) expanded.delete(item.id);
         else expanded.add(item.id);
+        renderChecklist();
+      });
+
+      if (checkable) {
+        row.querySelector('.checklist-checkbox').addEventListener('click', (e) => {
+          e.stopPropagation();
+          item.done = !item.done;
+          saveChecklist();
+          renderChecklist();
+        });
+      }
+
+      // Row click (on label or empty space): for checkable sections, toggle done; for
+      // category sections, toggle expansion.
+      row.addEventListener('click', (e) => {
+        if (e.target.closest('.checklist-delete') || e.target.closest('.checklist-chevron') || e.target.closest('.checklist-checkbox')) return;
+        if (checkable) {
+          item.done = !item.done;
+          saveChecklist();
+        } else {
+          if (expanded.has(item.id)) expanded.delete(item.id);
+          else expanded.add(item.id);
+        }
         renderChecklist();
       });
 
@@ -1885,7 +1919,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const label = SECTION_LABEL[key] || key;
     const text = prompt('New item for ' + label + ':');
     if (!text || !text.trim()) return;
-    checklistData[key].push({ id: nextId++, text: text.trim(), ideas: [] });
+    const item = { id: nextId++, text: text.trim(), ideas: [] };
+    if (SECTION_CHECKABLE[key]) item.done = false;
+    checklistData[key].push(item);
     saveChecklist();
     renderChecklist();
   };
